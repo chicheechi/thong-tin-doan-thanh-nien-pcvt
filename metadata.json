@@ -1,0 +1,6 @@
+{
+  "name": "Thu Thập Kết Quả Thi PCVT",
+  "description": "Ứng dụng thu thập thông tin và kết quả thi của đoàn viên, xuất thẳng ra Google Sheet.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
