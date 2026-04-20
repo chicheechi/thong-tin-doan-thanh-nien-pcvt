@@ -82,11 +82,26 @@
               </div>
               <form id="submitForm" onsubmit="submitForm(event)">
                 
-                <div class="mb-3">
-                  <label class="form-label">Họ và tên / MSNV</label>
-                  <input class="form-control" list="staffList" id="staffInput" placeholder="Nhập để tìm kiếm..." required disabled>
-                  <datalist id="staffList"></datalist>
-                  <div class="form-text" id="staffLoadingText" style="font-size: 11px; margin-top: 6px;">Đang tải danh sách nhân sự...</div>
+                <div class="row g-2 mb-3">
+                  <div class="col-12">
+                    <label class="form-label">1. Phòng ban</label>
+                    <select class="form-select" id="deptSelect" required onchange="onDeptChange()" disabled>
+                      <option value="">-- Chọn phòng ban --</option>
+                    </select>
+                    <div class="form-text" id="staffLoadingText" style="font-size: 11px; margin-top: 6px;">Đang tải danh sách nhân sự...</div>
+                  </div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                  <div class="col-8">
+                    <label class="form-label">2. Họ và tên</label>
+                    <input class="form-control" list="staffList" id="nameInput" placeholder="Nhập để tìm kiếm..." required disabled oninput="onNameChange()">
+                    <datalist id="staffList"></datalist>
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label">3. Số hiệu</label>
+                    <input type="text" class="form-control bg-light text-secondary font-monospace" id="msnvInput" placeholder="Tự động" readonly required>
+                  </div>
                 </div>
 
                 <div class="row g-2 mb-3">
@@ -195,14 +210,52 @@
 
       function populateStaff(data) {
         staffData = data;
-        const dl = document.getElementById('staffList');
-        data.forEach(s => {
+        const depts = [...new Set(data.map(s => s.department))].filter(Boolean);
+        const deptSelect = document.getElementById('deptSelect');
+        depts.forEach(dept => {
           const opt = document.createElement('option');
-          opt.value = s.id + ' - ' + s.name;
-          dl.appendChild(opt);
+          opt.value = dept;
+          opt.textContent = dept;
+          deptSelect.appendChild(opt);
         });
-        document.getElementById('staffInput').disabled = false;
-        document.getElementById('staffLoadingText').innerHTML = '<span class="text-success">Đã tải xong danh sách (' + data.length + ' nhân sự).</span>';
+        deptSelect.disabled = false;
+        document.getElementById('staffLoadingText').innerHTML = '<span class="text-success">Đã tải xong dữ liệu hệ thống.</span>';
+      }
+
+      function onDeptChange() {
+        const selectedDept = document.getElementById('deptSelect').value;
+        const nameInput = document.getElementById('nameInput');
+        const dl = document.getElementById('staffList');
+        const msnvInput = document.getElementById('msnvInput');
+
+        nameInput.value = '';
+        msnvInput.value = '';
+        dl.innerHTML = '';
+
+        if (selectedDept) {
+          nameInput.disabled = false;
+          const filtered = staffData.filter(s => s.department === selectedDept);
+          filtered.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.name;
+            dl.appendChild(opt);
+          });
+        } else {
+          nameInput.disabled = true;
+        }
+      }
+
+      function onNameChange() {
+        const selectedDept = document.getElementById('deptSelect').value;
+        const currentName = document.getElementById('nameInput').value;
+        const msnvInput = document.getElementById('msnvInput');
+
+        const found = staffData.find(s => s.department === selectedDept && s.name === currentName);
+        if (found) {
+          msnvInput.value = found.id;
+        } else {
+          msnvInput.value = '';
+        }
       }
 
       function previewImage(event) {
@@ -217,11 +270,12 @@
       function submitForm(event) {
         event.preventDefault();
         
-        const staffVal = document.getElementById('staffInput').value;
-        const validStaff = staffData.find(s => (s.id + ' - ' + s.name) === staffVal);
+        const msnvVal = document.getElementById('msnvInput').value;
+        const nameVal = document.getElementById('nameInput').value;
+        const deptVal = document.getElementById('deptSelect').value;
 
-        if (!validStaff) {
-          alert('Vui lòng chọn hoặc tìm Họ tên / MSNV hợp lệ từ danh sách có sẵn.');
+        if (!msnvVal) {
+          alert('Vui lòng chọn Họ và tên có sẵn trong danh sách (để tự động điền Số hiệu) trước khi nộp!');
           return;
         }
 
@@ -239,8 +293,8 @@
         const reader = new FileReader();
         reader.onload = function(e) {
           const payload = {
-            msnv: validStaff.id,
-            name: validStaff.name,
+            msnv: msnvVal,
+            name: nameVal,
             round: document.getElementById('roundSelect').value,
             date: document.getElementById('dateInput').value,
             imageBase64: e.target.result
@@ -253,7 +307,8 @@
             if (res.success) {
               document.getElementById('submitForm').reset();
               document.getElementById('imagePreview').style.display = 'none';
-              document.getElementById('staffInput').value = ''; 
+              document.getElementById('nameInput').disabled = true;
+              document.getElementById('msnvInput').value = ''; 
               historyData = [];
             }
           }).uploadResult(payload);

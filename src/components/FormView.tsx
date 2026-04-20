@@ -1,13 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react';
 import { mockStaff } from '../mockData';
 
 export default function FormView() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  
+  const [departments, setDepartments] = useState<string[]>([]);
+  const [selectedDept, setSelectedDept] = useState('');
+  const [selectedName, setSelectedName] = useState('');
+  const [calculatedMsnv, setCalculatedMsnv] = useState('');
+
+  useEffect(() => {
+    // Extract unique departments from mock data
+    const depts = Array.from(new Set(mockStaff.map(s => s.department)));
+    setDepartments(depts);
+  }, []);
+
+  const handleDeptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedDept(e.target.value);
+    setSelectedName('');
+    setCalculatedMsnv('');
+  };
+
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    setSelectedName(val);
+    const found = mockStaff.find(s => s.department === selectedDept && s.name === val);
+    if (found) {
+      setCalculatedMsnv(found.id);
+    } else {
+      setCalculatedMsnv('');
+    }
+  };
+
+  const filteredStaff = mockStaff.filter(s => s.department === selectedDept);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!calculatedMsnv) {
+      alert("Vui lòng chọn Họ và tên có sẵn trong danh sách (để tự động điền Số hiệu) trước khi nộp!");
+      return;
+    }
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
@@ -31,25 +65,57 @@ export default function FormView() {
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-slate-600 uppercase">Họ và tên / MSNV</label>
-          <input 
-            type="text" 
-            list="staffListReact" 
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-[Inter,sans-serif]"
-            placeholder="Nhập để tìm kiếm..."
-            required 
-          />
-          <datalist id="staffListReact">
-            {mockStaff.map(s => (
-              <option key={s.id} value={`${s.id} - ${s.name}`} />
+          <label className="block text-[11px] font-semibold text-slate-600 uppercase">1. Phòng ban</label>
+          <select 
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            value={selectedDept}
+            onChange={handleDeptChange}
+            required
+          >
+            <option value="">-- Chọn phòng ban --</option>
+            {departments.map((dept, idx) => (
+              <option key={idx} value={dept}>{dept}</option>
             ))}
-          </datalist>
+          </select>
+        </div>
+
+        <div className="grid grid-cols-12 gap-3">
+          <div className="col-span-8 space-y-1.5">
+            <label className="block text-[11px] font-semibold text-slate-600 uppercase">2. Họ và tên</label>
+            <input 
+              type="text" 
+              list="staffListReact" 
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-[Inter,sans-serif]"
+              placeholder="Nhập để tìm kiếm..."
+              value={selectedName}
+              onChange={handleNameChange}
+              disabled={!selectedDept}
+              required 
+            />
+            <datalist id="staffListReact">
+              {filteredStaff.map(s => (
+                <option key={s.id} value={s.name} />
+              ))}
+            </datalist>
+          </div>
+
+          <div className="col-span-4 space-y-1.5">
+            <label className="block text-[11px] font-semibold text-slate-600 uppercase">3. Số hiệu</label>
+            <input 
+              type="text" 
+              className="w-full bg-slate-100 border border-transparent rounded-lg px-3 py-2.5 text-sm font-mono text-slate-500 focus:outline-none"
+              placeholder="Tự động..."
+              value={calculatedMsnv}
+              readOnly
+              required 
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-600 uppercase">Vòng thi</label>
-            <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+            <label className="block text-[11px] font-semibold text-slate-600 uppercase">Vòng thi</label>
+            <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
               <option value="">-- Chọn vòng --</option>
               <option value="Vòng 1">Vòng 1</option>
               <option value="Vòng 2">Vòng 2</option>
@@ -60,10 +126,10 @@ export default function FormView() {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-slate-600 uppercase">Ngày thi</label>
+            <label className="block text-[11px] font-semibold text-slate-600 uppercase">Ngày thi</label>
             <input 
               type="date" 
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
               defaultValue={new Date().toISOString().split('T')[0]}
               required 
             />
@@ -71,7 +137,7 @@ export default function FormView() {
         </div>
 
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-slate-600 uppercase">Ảnh minh chứng kết quả</label>
+          <label className="block text-[11px] font-semibold text-slate-600 uppercase">Ảnh minh chứng kết quả</label>
           <div className="relative border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50 hover:border-blue-400 group transition-colors overflow-hidden">
             <input 
               type="file" 
@@ -89,11 +155,11 @@ export default function FormView() {
         <button 
           type="submit" 
           disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 mt-4 rounded-xl transition-colors shadow-lg shadow-blue-200 uppercase text-sm tracking-widest flex justify-center items-center gap-2"
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 mt-2 rounded-xl transition-colors shadow-lg shadow-blue-200 uppercase text-sm tracking-widest flex justify-center items-center gap-2"
         >
-          {loading ? (
+          {loading && (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-          ) : null}
+          )}
           {loading ? 'ĐANG GỬI...' : 'GỬI KẾT QUẢ NGAY'}
         </button>
       </form>

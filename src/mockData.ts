@@ -1,15 +1,15 @@
 // Shared mock state for the React preview UI
 export const mockStaff = [
-  { id: 'VTL001', name: 'Nguyễn Văn Định' },
-  { id: 'VTL002', name: 'Trần Thị Nhàn' },
-  { id: 'VTL003', name: 'Lê Hoàng Phúc' },
-  { id: 'VTL004', name: 'Phạm Minh Hằng' },
-  { id: 'VTL005', name: 'Đặng Bảo Khoa' },
-  { id: 'VTL006', name: 'Vũ Thanh Tùng' },
-  { id: 'VTL007', name: 'Hoàng Kim Dung' },
-  { id: 'VTL008', name: 'Đinh Tiến Đạt' },
-  { id: 'VTL009', name: 'Bùi Tuấn Anh' },
-  { id: 'VTL010', name: 'Lý Lan Anh' },
+  { id: 'VTL001', name: 'Nguyễn Văn Định', department: 'Phòng Kỹ thuật' },
+  { id: 'VTL002', name: 'Trần Thị Nhàn', department: 'Phòng Kỹ thuật' },
+  { id: 'VTL003', name: 'Lê Hoàng Phúc', department: 'Phòng Kỹ thuật' },
+  { id: 'VTL004', name: 'Phạm Minh Hằng', department: 'Phòng Kinh doanh' },
+  { id: 'VTL005', name: 'Đặng Bảo Khoa', department: 'Phòng Kinh doanh' },
+  { id: 'VTL006', name: 'Vũ Thanh Tùng', department: 'Phòng Tổ chức HC' },
+  { id: 'VTL007', name: 'Hoàng Kim Dung', department: 'Phòng Tổ chức HC' },
+  { id: 'VTL008', name: 'Đinh Tiến Đạt', department: 'Ban Giám đốc' },
+  { id: 'VTL009', name: 'Bùi Tuấn Anh', department: 'Ban Giám đốc' },
+  { id: 'VTL010', name: 'Lý Lan Anh', department: 'Ban Giám đốc' },
 ];
 
 export const mockHistory = [

@@ -1,11 +1,10 @@
 import { useState } from 'react';
-import { Upload, History, FileCode2 } from 'lucide-react';
+import { Upload, History } from 'lucide-react';
 import FormView from './components/FormView';
 import HistoryView from './components/HistoryView';
-import GasGuide from './components/GasGuide';
 
 export default function App() {
-  const [tab, setTab] = useState<'form' | 'history' | 'guide'>('form');
+  const [tab, setTab] = useState<'form' | 'history'>('form');
 
   return (
     <div className="min-h-screen bg-slate-100 flex flex-col font-sans">
@@ -27,7 +26,6 @@ export default function App() {
           <div className="hidden lg:flex gap-2 bg-white p-1 rounded-full border border-slate-200 shadow-sm">
             <button onClick={() => setTab('form')} className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${tab === 'form' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-transparent text-slate-500 hover:text-slate-800'}`}>Nộp kết quả</button>
             <button onClick={() => setTab('history')} className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${tab === 'history' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-transparent text-slate-500 hover:text-slate-800'}`}>Lịch sử nộp</button>
-            <button onClick={() => setTab('guide')} className={`px-5 py-2 rounded-full text-sm font-bold transition-colors ${tab === 'guide' ? 'bg-blue-600 text-white shadow-md shadow-blue-200' : 'bg-transparent text-slate-500 hover:text-slate-800'}`}>Mã Nguồn GAS</button>
           </div>
         </header>
 
@@ -37,9 +35,6 @@ export default function App() {
           </section>
           <section className={`lg:col-span-7 flex-col gap-6 ${tab === 'history' ? 'flex' : 'hidden lg:flex'}`}>
             <HistoryView />
-          </section>
-          <section className={`lg:col-span-12 flex-col gap-6 ${tab === 'guide' ? 'flex' : 'hidden lg:flex mt-0'}`}>
-            <GasGuide />
           </section>
         </main>
       </div>
@@ -60,13 +55,6 @@ export default function App() {
           >
              <History size={20} className="mb-1" strokeWidth={tab === 'history' ? 2.5 : 2} />
              <span className="text-[10px] tracking-wide uppercase">Lịch sử</span>
-          </button>
-          <button 
-             onClick={() => setTab('guide')} 
-             className={`flex flex-col items-center flex-1 py-1.5 px-2 rounded-xl transition-all ${tab === 'guide' ? 'text-blue-600 font-bold bg-blue-50/80 scale-105' : 'text-slate-500 font-medium hover:text-slate-700'}`}
-          >
-             <FileCode2 size={20} className="mb-1" strokeWidth={tab === 'guide' ? 2.5 : 2} />
-             <span className="text-[10px] tracking-wide uppercase">Mã Nguồn</span>
           </button>
         </div>
       </nav>

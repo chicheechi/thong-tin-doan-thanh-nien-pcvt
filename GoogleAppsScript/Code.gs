@@ -14,14 +14,26 @@ function getStaffData() {
   const data = sheet.getDataRange().getDisplayValues();
   const staffList = [];
 
+  if (data.length <= 1) return [];
+
+  const headers = data[0].map(h => h.toString().toLowerCase().trim());
+  let deptIdx = headers.findIndex(h => h.includes('phòng ban'));
+  let nameIdx = headers.findIndex(h => h.includes('họ') && h.includes('tên'));
+  let msnvIdx = headers.findIndex(h => h.includes('số hiệu') || h.includes('msnv'));
+
+  // Nếu không tìm thấy bằng tên cột, fallback về các cột mẫu
+  if (deptIdx === -1) deptIdx = 3; // Ví dụ: Cột D
+  if (nameIdx === -1) nameIdx = 2; // Ví dụ: Cột C
+  if (msnvIdx === -1) msnvIdx = 1; // Ví dụ: Cột B
+
   // Duyệt từ dòng 2 (bỏ qua dòng tiêu đề)
   for (let i = 1; i < data.length; i++) {
-    // Cần điều chỉnh chỉ số cột nếu file gốc khác. Giả định Cột A(0)=STT, Cột B(1)=MSNV, Cột C(2)=Họ Tên
-    // (Bác có thể thay số 1 và 2 ở dưới cho chuẩn với sheet thực tế)
-    const msnv = data[i][1] ? data[i][1].toString().trim() : ''; 
-    const name = data[i][2] ? data[i][2].toString().trim() : '';
+    const msnv = data[i][msnvIdx] ? data[i][msnvIdx].toString().trim() : ''; 
+    const name = data[i][nameIdx] ? data[i][nameIdx].toString().trim() : '';
+    const department = data[i][deptIdx] ? data[i][deptIdx].toString().trim() : 'Khác';
+
     if (msnv && name) {
-      staffList.push({ id: msnv, name: name });
+      staffList.push({ id: msnv, name: name, department: department });
     }
   }
   return staffList;
