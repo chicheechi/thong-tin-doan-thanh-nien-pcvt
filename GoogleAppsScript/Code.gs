@@ -16,20 +16,20 @@ function getStaffData() {
   if (data.length <= 1) return [];
 
   let headerRowIdx = 0;
-  // Quét 5 dòng đầu tiên để tự động tìm dòng tiêu đề
+  // Quét 5 dòng đầu tiên để tự động tìm dòng tiêu đề và làm sạch khoảng trắng/xuống dòng
   for (let i = 0; i < Math.min(5, data.length); i++) {
-    const rowStr = data[i].join('').toLowerCase();
-    if (rowStr.includes('phòng ban') || rowStr.includes('họ') || rowStr.includes('số hiệu')) {
+    const rowStr = data[i].map(c => c.toString().toLowerCase().replace(/\s+/g, '')).join('');
+    if (rowStr.includes('phòngban') || rowStr.includes('họvàtên') || rowStr.includes('sốhiệu')) {
       headerRowIdx = i;
       break;
     }
   }
 
-  // Tự động nhận diện cột linh hoạt từ dòng tiêu đề tìm được
-  const headers = data[headerRowIdx].map(h => h.toString().toLowerCase().trim());
-  let deptIdx = headers.findIndex(h => h.includes('phòng ban') || h.includes('tên phòng') || h.includes('đơn vị'));
-  let nameIdx = headers.findIndex(h => h.includes('họ') && h.includes('tên'));
-  let msnvIdx = headers.findIndex(h => h.includes('số hiệu') || h.includes('msnv') || h.includes('mã nhân viên'));
+  // Tự động nhận diện cột linh hoạt (loại bỏ mọi dấu cách, enter rỗng để quét khớp 100%)
+  const cleanHeaders = data[headerRowIdx].map(h => h.toString().toLowerCase().replace(/\s+/g, ''));
+  let deptIdx = cleanHeaders.findIndex(h => h.includes('phòngban') || h.includes('tênphòng') || h.includes('đơnvị'));
+  let nameIdx = cleanHeaders.findIndex(h => h.includes('họ') && h.includes('tên'));
+  let msnvIdx = cleanHeaders.findIndex(h => h.includes('sốhiệu') || h.includes('msnv') || h.includes('mãnhânviên'));
 
   // Fallback lại cột mặc định theo bảng nếu bị sai tiêu đề
   if (deptIdx === -1) deptIdx = 5; // Cột F mặc định
