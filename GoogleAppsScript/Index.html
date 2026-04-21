@@ -95,8 +95,9 @@
                 <div class="row g-2 mb-3">
                   <div class="col-8">
                     <label class="form-label">2. Họ và tên</label>
-                    <input class="form-control" list="staffList" id="nameInput" placeholder="Nhập để tìm kiếm..." required disabled oninput="onNameChange()">
-                    <datalist id="staffList"></datalist>
+                    <select class="form-select" id="nameSelect" required disabled onchange="onNameChange()">
+                      <option value="">-- Chọn nhân sự --</option>
+                    </select>
                   </div>
                   <div class="col-4">
                     <label class="form-label">3. Số hiệu</label>
@@ -222,30 +223,29 @@
 
       function onDeptChange() {
         const selectedDept = document.getElementById('deptSelect').value;
-        const nameInput = document.getElementById('nameInput');
-        const dl = document.getElementById('staffList');
+        const nameSelect = document.getElementById('nameSelect');
         const msnvInput = document.getElementById('msnvInput');
 
-        nameInput.value = '';
+        nameSelect.innerHTML = '<option value="">-- Chọn nhân sự --</option>';
         msnvInput.value = '';
-        dl.innerHTML = '';
 
         if (selectedDept) {
-          nameInput.disabled = false;
+          nameSelect.disabled = false;
           const filtered = staffData.filter(s => s.department === selectedDept);
           filtered.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s.name;
-            dl.appendChild(opt);
+            opt.textContent = s.name;
+            nameSelect.appendChild(opt);
           });
         } else {
-          nameInput.disabled = true;
+          nameSelect.disabled = true;
         }
       }
 
       function onNameChange() {
         const selectedDept = document.getElementById('deptSelect').value;
-        const currentName = document.getElementById('nameInput').value;
+        const currentName = document.getElementById('nameSelect').value;
         const msnvInput = document.getElementById('msnvInput');
 
         const found = staffData.find(s => s.department === selectedDept && s.name === currentName);
@@ -269,7 +269,7 @@
         event.preventDefault();
         
         const msnvVal = document.getElementById('msnvInput').value;
-        const nameVal = document.getElementById('nameInput').value;
+        const nameVal = document.getElementById('nameSelect').value;
         const deptVal = document.getElementById('deptSelect').value;
 
         if (!msnvVal) {
@@ -305,7 +305,7 @@
             if (res.success) {
               document.getElementById('submitForm').reset();
               document.getElementById('imagePreview').style.display = 'none';
-              document.getElementById('nameInput').disabled = true;
+              document.getElementById('nameSelect').disabled = true;
               document.getElementById('msnvInput').value = ''; 
               historyData = [];
             }

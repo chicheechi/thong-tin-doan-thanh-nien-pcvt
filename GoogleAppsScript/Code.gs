@@ -1,4 +1,4 @@
-const SPREADSHEET_ID = '17MgncO6J1_GTDJHJHBe9Y37E44p4znXDG-XfLFN01Qw';
+const SPREADSHEET_ID = '1Qui6AL8gnfS9WWFDGr2LFpOvpUwBCsr4e8j0Z-xiETc';
 const IMAGE_FOLDER_NAME = 'KetQuaThi_Images';
 
 function doGet() {
@@ -9,25 +9,35 @@ function doGet() {
 
 function getStaffData() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  // Giả sử danh sách nhân sự nằm ở sheet đầu tiên
-  const sheet = ss.getSheets()[0];
+  const sheet = ss.getSheets()[0]; // Lọc danh sách ở Sheet đầu tiên
   const data = sheet.getDataRange().getDisplayValues();
   const staffList = [];
 
   if (data.length <= 1) return [];
 
-  const headers = data[0].map(h => h.toString().toLowerCase().trim());
-  let deptIdx = headers.findIndex(h => h.includes('phòng ban'));
+  let headerRowIdx = 0;
+  // Quét 5 dòng đầu tiên để tự động tìm dòng tiêu đề
+  for (let i = 0; i < Math.min(5, data.length); i++) {
+    const rowStr = data[i].join('').toLowerCase();
+    if (rowStr.includes('phòng ban') || rowStr.includes('họ') || rowStr.includes('số hiệu')) {
+      headerRowIdx = i;
+      break;
+    }
+  }
+
+  // Tự động nhận diện cột linh hoạt từ dòng tiêu đề tìm được
+  const headers = data[headerRowIdx].map(h => h.toString().toLowerCase().trim());
+  let deptIdx = headers.findIndex(h => h.includes('phòng ban') || h.includes('tên phòng') || h.includes('đơn vị'));
   let nameIdx = headers.findIndex(h => h.includes('họ') && h.includes('tên'));
-  let msnvIdx = headers.findIndex(h => h.includes('số hiệu') || h.includes('msnv'));
+  let msnvIdx = headers.findIndex(h => h.includes('số hiệu') || h.includes('msnv') || h.includes('mã nhân viên'));
 
-  // Nếu không tìm thấy bằng tên cột, fallback về các cột mẫu
-  if (deptIdx === -1) deptIdx = 3; // Ví dụ: Cột D
-  if (nameIdx === -1) nameIdx = 2; // Ví dụ: Cột C
-  if (msnvIdx === -1) msnvIdx = 1; // Ví dụ: Cột B
+  // Fallback lại cột mặc định theo bảng nếu bị sai tiêu đề
+  if (deptIdx === -1) deptIdx = 5; // Cột F mặc định
+  if (nameIdx === -1) nameIdx = 2; // Cột C mặc định
+  if (msnvIdx === -1) msnvIdx = 1; // Cột B mặc định
 
-  // Duyệt từ dòng 2 (bỏ qua dòng tiêu đề)
-  for (let i = 1; i < data.length; i++) {
+  // Duyệt dữ liệu từ dòng kế tiếp của headers
+  for (let i = headerRowIdx + 1; i < data.length; i++) {
     const msnv = data[i][msnvIdx] ? data[i][msnvIdx].toString().trim() : ''; 
     const name = data[i][nameIdx] ? data[i][nameIdx].toString().trim() : '';
     const department = data[i][deptIdx] ? data[i][deptIdx].toString().trim() : 'Khác';

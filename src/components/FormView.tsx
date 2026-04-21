@@ -23,7 +23,7 @@ export default function FormView() {
     setCalculatedMsnv('');
   };
 
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleNameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedName(val);
     const found = mockStaff.find(s => s.department === selectedDept && s.name === val);
@@ -82,21 +82,18 @@ export default function FormView() {
         <div className="grid grid-cols-12 gap-3">
           <div className="col-span-8 space-y-1.5">
             <label className="block text-[11px] font-semibold text-slate-600 uppercase">2. Họ và tên</label>
-            <input 
-              type="text" 
-              list="staffListReact" 
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-[Inter,sans-serif]"
-              placeholder="Nhập để tìm kiếm..."
+            <select 
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
               value={selectedName}
               onChange={handleNameChange}
               disabled={!selectedDept}
               required 
-            />
-            <datalist id="staffListReact">
+            >
+              <option value="">-- Chọn nhân sự --</option>
               {filteredStaff.map(s => (
-                <option key={s.id} value={s.name} />
+                <option key={s.id} value={s.name}>{s.name}</option>
               ))}
-            </datalist>
+            </select>
           </div>
 
           <div className="col-span-4 space-y-1.5">
