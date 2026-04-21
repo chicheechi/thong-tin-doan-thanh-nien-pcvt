@@ -3,8 +3,10 @@ import { GAS_WEB_APP_URL } from '../config';
 export const apiService = {
   getStaff: async () => {
     try {
+      // Đối với GET requests vào Google Script bị dính CORS, phải ép mode cors nhưng Google sẽ tự văng redirect
       const response = await fetch(`${GAS_WEB_APP_URL}?action=getStaff`, {
         method: 'GET',
+        redirect: 'follow'
       });
       return await response.json();
     } catch (error) {
@@ -17,6 +19,7 @@ export const apiService = {
     try {
       const response = await fetch(`${GAS_WEB_APP_URL}?action=getHistory`, {
         method: 'GET',
+        redirect: 'follow'
       });
       return await response.json();
     } catch (error) {
@@ -34,6 +37,7 @@ export const apiService = {
           "Content-Type": "text/plain;charset=utf-8",
         },
         body: JSON.stringify(payload),
+        redirect: 'follow'
       });
       return await response.json();
     } catch (error) {

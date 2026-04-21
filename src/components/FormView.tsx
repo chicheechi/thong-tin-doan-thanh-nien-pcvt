@@ -123,11 +123,16 @@ export default function FormView() {
             disabled={departments.length === 0}
             required
           >
-            <option value="">{departments.length === 0 ? "Đang xách dữ liệu từ Google Sheet..." : "-- Chọn phòng ban --"}</option>
+            <option value="">{departments.length === 0 ? "Xin hãy chờ..." : "-- Chọn phòng ban --"}</option>
             {departments.map((dept, idx) => (
               <option key={idx} value={dept}>{dept}</option>
             ))}
           </select>
+          {departments.length === 0 && (
+             <p className="text-[10px] text-red-500 mt-1">
+               * Nếu chờ quá lâu mà không thấy dữ liệu, bạn vui lòng copy <b>Web App URL</b> của Google Apps Script dán vào file <code>config.ts</code> trên Vercel nhé.
+             </p>
+          )}
         </div>
 
         <div className="grid grid-cols-12 gap-3">
