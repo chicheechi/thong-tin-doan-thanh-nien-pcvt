@@ -82,12 +82,12 @@ export default function FormView() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!calculatedMsnv) {
-      alert("Vui lòng chọn Họ và tên có sẵn trong danh sách (để tự động điền Số hiệu) trước khi nộp!");
+    if (!selectedDept || !selectedName || !calculatedMsnv || !round) {
+      alert("Vui lòng điền đầy đủ thông tin vào các trường bắt buộc!");
       return;
     }
     if (!imageBase64) {
-      alert("Vui lòng tải lên ảnh minh chứng!");
+      alert("Vui lòng tải lên ảnh minh chứng kết quả!");
       return;
     }
 
@@ -133,9 +133,9 @@ export default function FormView() {
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.1)] flex-grow flex flex-col">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="font-bold text-slate-800 uppercase text-xs tracking-wider">Biểu mẫu nộp kết quả</h2>
+    <div className="bg-white border border-white rounded-[32px] p-6 lg:p-8 shadow-xl shadow-slate-200/60 flex-grow flex flex-col">
+      <div className="flex items-center justify-between mb-8">
+        <h2 className="font-black text-slate-800 uppercase text-sm tracking-[0.1em]">Biểu mẫu nộp kết quả</h2>
       </div>
 
       {success && (
@@ -144,11 +144,11 @@ export default function FormView() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-1.5">
-          <label className="block text-[11px] font-semibold text-slate-600 uppercase">1. Phòng ban</label>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="space-y-2">
+          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">1. Phòng ban <span className="text-red-500">*</span></label>
           <select 
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 transition-all"
             value={selectedDept}
             onChange={handleDeptChange}
             disabled={departments.length === 0}
@@ -160,17 +160,17 @@ export default function FormView() {
             ))}
           </select>
           {departments.length === 0 && (
-             <p className="text-[10px] text-red-500 mt-1">
-               * Nếu chờ quá lâu mà không thấy dữ liệu, bạn vui lòng copy <b>Web App URL</b> của Google Apps Script dán vào file <code>config.ts</code> trên Vercel nhé.
+             <p className="text-[10px] text-red-500 mt-1 italic animate-pulse px-1">
+               🕒 Đang kết nối dữ liệu từ Google Sheets, vui lòng đợi giây lát...
              </p>
           )}
         </div>
 
-        <div className="grid grid-cols-12 gap-3">
-          <div className="col-span-8 space-y-1.5">
-            <label className="block text-[11px] font-semibold text-slate-600 uppercase">2. Họ và tên</label>
+        <div className="grid grid-cols-12 gap-4">
+          <div className="col-span-12 sm:col-span-8 space-y-2">
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">2. Họ và tên <span className="text-red-500">*</span></label>
             <select 
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 transition-all"
               value={selectedName}
               onChange={handleNameChange}
               disabled={!selectedDept}
@@ -183,11 +183,11 @@ export default function FormView() {
             </select>
           </div>
 
-          <div className="col-span-4 space-y-1.5">
-            <label className="block text-[11px] font-semibold text-slate-600 uppercase">3. Số hiệu</label>
+          <div className="col-span-12 sm:col-span-4 space-y-2">
+            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">3. Số hiệu</label>
             <input 
               type="text" 
-              className="w-full bg-slate-100 border border-transparent rounded-lg px-3 py-2.5 text-sm font-mono text-slate-500 focus:outline-none"
+              className="w-full bg-slate-100 border border-transparent rounded-xl px-4 py-3 text-sm font-mono font-bold text-slate-400 focus:outline-none cursor-not-allowed"
               placeholder="..."
               value={calculatedMsnv}
               readOnly
@@ -196,10 +196,10 @@ export default function FormView() {
           </div>
         </div>
 
-        <div className="space-y-1.5 mb-4">
-          <label className="block text-[11px] font-semibold text-slate-600 uppercase">Vòng thi</label>
+        <div className="space-y-2">
+          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Vòng thi <span className="text-red-500">*</span></label>
           <select 
-            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium" 
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 transition-all" 
             value={round}
             onChange={(e) => setRound(e.target.value)}
             required
@@ -212,24 +212,25 @@ export default function FormView() {
           </select>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="block text-[11px] font-semibold text-slate-600 uppercase">Ảnh minh chứng kết quả</label>
-          <div className="relative border-2 border-dashed border-slate-300 rounded-xl p-4 text-center bg-slate-50 hover:border-blue-400 group transition-colors overflow-hidden">
+        <div className="space-y-2">
+          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ảnh minh chứng kết quả <span className="text-red-500">*</span></label>
+          <div className={`relative border-2 border-dashed rounded-2xl p-4 text-center transition-all overflow-hidden ${previewSrc ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:border-blue-400 group'}`}>
             <input 
               type="file" 
               accept="image/*" 
               onChange={handleFileChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-              required={!previewSrc} 
+              required={!previewSrc}
             />
             {!previewSrc ? (
-              <div className="flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors pointer-events-none py-4">
-                 <Upload className="mb-2" strokeWidth={1.5} size={32} />
-                 <span className="text-xs font-medium">Chạm để chụp màn hình hoặc chọn ảnh</span>
+              <div className="flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors pointer-events-none py-8">
+                 <Upload className="mb-3 animate-bounce-slow" strokeWidth={1.5} size={36} />
+                 <span className="text-xs font-semibold">Chạm để chụp màn hình hoặc chọn ảnh</span>
               </div>
             ) : (
-              <div className="relative z-0">
-                <img src={previewSrc} alt="Preview" className="max-h-40 mx-auto rounded-lg shadow-sm" />
+              <div className="relative z-0 py-2">
+                <img src={previewSrc} alt="Preview" className="max-h-52 mx-auto rounded-xl shadow-lg border-2 border-white" />
+                <div className="mt-3 text-[10px] text-blue-600 font-bold uppercase">Đã chọn ảnh - Chạm để thay đổi</div>
               </div>
             )}
           </div>
@@ -237,13 +238,13 @@ export default function FormView() {
 
         <button 
           type="submit" 
-          disabled={loading || departments.length === 0}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 mt-2 rounded-xl transition-colors shadow-lg shadow-blue-200 uppercase text-sm tracking-widest flex justify-center items-center gap-2 disabled:bg-blue-300"
+          disabled={loading || !imageBase64}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 mt-4 rounded-xl transition-all duration-300 shadow-xl shadow-blue-200 uppercase text-sm tracking-[0.1em] flex justify-center items-center gap-3 disabled:bg-blue-300 disabled:shadow-none hover:scale-[1.01] active:scale-[0.98]"
         >
           {loading && (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           )}
-          {loading ? 'ĐANG GỬI LÊN DRIVE...' : 'GỬI KẾT QUẢ NGAY'}
+          {loading ? 'ĐANG GỬI KẾT QUẢ...' : 'GỬI KẾT QUẢ NGAY'}
         </button>
       </form>
     </div>

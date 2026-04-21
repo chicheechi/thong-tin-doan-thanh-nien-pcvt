@@ -25,15 +25,14 @@ export default function HistoryView() {
   });
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.1)] flex-grow flex flex-col min-h-[50vh]">
-      <div className="flex flex-wrap gap-2 items-center justify-between mb-4">
+    <div className="bg-white border border-white rounded-[32px] p-6 lg:p-8 shadow-xl shadow-slate-200/60 flex-grow flex flex-col h-full">
+      <div className="flex flex-wrap gap-4 items-center justify-between mb-8">
         <div>
-           <h2 className="font-bold text-slate-800 uppercase text-xs tracking-wider">Lịch sử nộp bài</h2>
-           <p className="text-[10px] text-slate-400 mt-1 uppercase">Dữ liệu cập nhật từ Google Sheets API</p>
+           <h2 className="font-black text-slate-800 uppercase text-sm tracking-[0.1em]">Lịch sử nộp bài</h2>
         </div>
-        <div className="flex gap-2 items-center">
+        <div className="flex gap-3 items-center">
           <select 
-            className="text-[11px] bg-slate-100 border-none rounded px-2 py-1.5 font-bold text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="text-[11px] bg-slate-50 border border-slate-200 rounded-full px-4 py-2 font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all cursor-pointer"
             value={filterRound}
             onChange={e => setFilterRound(e.target.value)}
           >
@@ -43,31 +42,35 @@ export default function HistoryView() {
             <option value="Tuần 03">Tuần 03</option>
             <option value="Tuần 04">Tuần 04</option>
           </select>
-          <input 
-            type="text" 
-            placeholder="Tìm MSNV..." 
-            className="text-[11px] bg-slate-100 border-none rounded px-2 py-1.5 w-24 font-bold text-slate-600 focus:outline-none focus:ring-1 focus:ring-blue-500 placeholder:font-normal"
-            value={filterMSNV}
-            onChange={e => setFilterMSNV(e.target.value)}
-          />
+          <div className="relative">
+            <input 
+              type="text" 
+              placeholder="Tìm MSNV..." 
+              className="text-[11px] bg-slate-50 border border-slate-200 rounded-full px-4 py-2 w-32 font-bold text-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:font-normal transition-all"
+              value={filterMSNV}
+              onChange={e => setFilterMSNV(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex-grow overflow-auto flex flex-col">
+      <div className="flex-grow overflow-auto flex flex-col custom-scrollbar">
         {loading ? (
-           <div className="text-center py-10 text-slate-400 text-sm font-medium flex flex-col items-center">
-             <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
-             Đang tải dữ liệu từ Google Sheets...
+           <div className="text-center py-20 text-slate-400 text-sm font-medium flex flex-col items-center">
+             <div className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+             Đang tải dữ liệu phòng truyền thống...
            </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-10 text-slate-400 text-sm font-medium">Không tìm thấy dữ liệu.</div>
+          <div className="text-center py-20 bg-slate-50 rounded-3xl border border-dashed border-slate-200 text-slate-400 text-sm font-medium">
+            Chưa có dữ liệu nộp bài nào được ghi nhận.
+          </div>
         ) : (
           <table className="w-full text-left border-collapse">
-            <thead className="sticky top-0 bg-white border-b border-slate-100">
-              <tr className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">
-                <th className="pb-3 pt-0 px-2 lg:px-4 hidden sm:table-cell">MSNV</th>
-                <th className="pb-3 pt-0 px-2 lg:px-4">Họ và tên</th>
-                <th className="pb-3 pt-0 px-2 lg:px-4">Vòng</th>
+            <thead className="sticky top-0 bg-white z-10">
+              <tr className="text-[10px] text-slate-400 uppercase font-black tracking-widest border-b border-slate-100">
+                <th className="pb-4 pt-0 px-4">MSNV</th>
+                <th className="pb-4 pt-0 px-4">Họ và tên</th>
+                <th className="pb-4 pt-0 px-4">Vòng</th>
               </tr>
             </thead>
             <tbody className="text-xs text-slate-700 font-medium">
@@ -75,15 +78,16 @@ export default function HistoryView() {
                 <tr 
                   key={idx} 
                   onClick={() => setSelectedItem(item)}
-                  className="hover:bg-blue-50/50 cursor-pointer transition-colors border-b border-slate-50 group"
+                  className="hover:bg-blue-50/40 cursor-pointer transition-all border-b border-slate-50 group hover:translate-x-1"
                 >
-                  <td className="py-3 px-2 lg:px-4 font-mono text-blue-600 hidden sm:table-cell">{item.msnv}</td>
-                  <td className="py-3 px-2 lg:px-4 text-slate-800 font-semibold group-hover:text-blue-700">
+                  <td className="py-4 px-4 font-mono font-bold text-blue-500">{item.msnv}</td>
+                  <td className="py-4 px-4 text-slate-700 font-bold group-hover:text-blue-700">
                      {item.name}
-                     <span className="sm:hidden block font-mono text-blue-600 text-[10px]">{item.msnv}</span>
                   </td>
-                  <td className="py-3 px-2 lg:px-4 whitespace-nowrap">
-                    <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded-md font-bold text-[10px] uppercase border border-blue-100">{item.round}</span>
+                  <td className="py-4 px-4 whitespace-nowrap">
+                    <span className="bg-blue-600/10 text-blue-600 px-3 py-1 rounded-full font-black text-[9px] uppercase tracking-tighter border border-blue-600/10">
+                      {item.round}
+                    </span>
                   </td>
                 </tr>
               ))}
