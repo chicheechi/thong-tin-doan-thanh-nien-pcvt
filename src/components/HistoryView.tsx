@@ -26,12 +26,11 @@ export default function HistoryView() {
             value={filterRound}
             onChange={e => setFilterRound(e.target.value)}
           >
-            <option value="">Tất cả Vòng</option>
-            <option value="Vòng 1">Vòng 1</option>
-            <option value="Vòng 2">Vòng 2</option>
-            <option value="Vòng 3">Vòng 3</option>
-            <option value="Vòng 4">Vòng 4</option>
-            <option value="Vòng 5">Vòng 5</option>
+            <option value="">Tất cả Tuần</option>
+            <option value="Tuần 01">Tuần 01</option>
+            <option value="Tuần 02">Tuần 02</option>
+            <option value="Tuần 03">Tuần 03</option>
+            <option value="Tuần 04">Tuần 04</option>
           </select>
           <input 
             type="text" 

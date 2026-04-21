@@ -115,13 +115,12 @@ export default function FormView() {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="block text-[11px] font-semibold text-slate-600 uppercase">Vòng thi</label>
-            <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-              <option value="">-- Chọn vòng --</option>
-              <option value="Vòng 1">Vòng 1</option>
-              <option value="Vòng 2">Vòng 2</option>
-              <option value="Vòng 3">Vòng 3</option>
-              <option value="Vòng 4">Vòng 4</option>
-              <option value="Vòng 5">Vòng 5</option>
+            <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium" required>
+              <option value="">-- Chọn tuần thi --</option>
+              <option value="Tuần 01">Tuần 01 (15/4 - 22/4/2026)</option>
+              <option value="Tuần 02">Tuần 02 (23/4 - 29/4/2026)</option>
+              <option value="Tuần 03">Tuần 03 (30/4 - 06/5/2026)</option>
+              <option value="Tuần 04">Tuần 04 (07/5 - 13/5/2026)</option>
             </select>
           </div>
 
