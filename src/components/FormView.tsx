@@ -101,7 +101,7 @@ export default function FormView() {
             <input 
               type="text" 
               className="w-full bg-slate-100 border border-transparent rounded-lg px-3 py-2.5 text-sm font-mono text-slate-500 focus:outline-none"
-              placeholder="Tự động..."
+              placeholder="..."
               value={calculatedMsnv}
               readOnly
               required 
@@ -109,27 +109,15 @@ export default function FormView() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="block text-[11px] font-semibold text-slate-600 uppercase">Vòng thi</label>
-            <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium" required>
-              <option value="">-- Chọn tuần thi --</option>
-              <option value="Tuần 01">Tuần 01 (15/4 - 22/4/2026)</option>
-              <option value="Tuần 02">Tuần 02 (23/4 - 29/4/2026)</option>
-              <option value="Tuần 03">Tuần 03 (30/4 - 06/5/2026)</option>
-              <option value="Tuần 04">Tuần 04 (07/5 - 13/5/2026)</option>
-            </select>
-          </div>
-
-          <div className="space-y-1.5">
-            <label className="block text-[11px] font-semibold text-slate-600 uppercase">Ngày thi</label>
-            <input 
-              type="date" 
-              className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500" 
-              defaultValue={new Date().toISOString().split('T')[0]}
-              required 
-            />
-          </div>
+        <div className="space-y-1.5 mb-4">
+          <label className="block text-[11px] font-semibold text-slate-600 uppercase">Vòng thi</label>
+          <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium" required>
+            <option value="">-- Chọn tuần thi --</option>
+            <option value="Tuần 01">Tuần 01 (15/4 - 22/4/2026)</option>
+            <option value="Tuần 02">Tuần 02 (23/4 - 29/4/2026)</option>
+            <option value="Tuần 03">Tuần 03 (30/4 - 06/5/2026)</option>
+            <option value="Tuần 04">Tuần 04 (07/5 - 13/5/2026)</option>
+          </select>
         </div>
 
         <div className="space-y-1.5">

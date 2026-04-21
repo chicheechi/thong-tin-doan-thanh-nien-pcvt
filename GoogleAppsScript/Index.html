@@ -101,12 +101,12 @@
                   </div>
                   <div class="col-4">
                     <label class="form-label">3. Số hiệu</label>
-                    <input type="text" class="form-control bg-light text-secondary font-monospace" id="msnvInput" placeholder="Tự động" readonly required>
+                    <input type="text" class="form-control bg-light text-secondary font-monospace" id="msnvInput" placeholder="..." readonly required>
                   </div>
                 </div>
 
                 <div class="row g-2 mb-3">
-                  <div class="col-6">
+                  <div class="col-12">
                     <label class="form-label">Vòng thi</label>
                     <select class="form-select" id="roundSelect" required>
                       <option value="">-- Chọn tuần thi --</option>
@@ -115,10 +115,6 @@
                       <option value="Tuần 03">Tuần 03 (30/4 - 06/5/2026)</option>
                       <option value="Tuần 04">Tuần 04 (07/5 - 13/5/2026)</option>
                     </select>
-                  </div>
-                  <div class="col-6">
-                    <label class="form-label">Ngày thi</label>
-                    <input type="date" class="form-control" id="dateInput" required>
                   </div>
                 </div>
 
@@ -187,8 +183,7 @@
           <div class="modal-body text-center">
             <p class="mb-1 text-start"><strong class="text-muted">MSNV:</strong> <span id="m_msnv"></span></p>
             <p class="mb-1 text-start"><strong class="text-muted">Họ tên:</strong> <span id="m_name"></span></p>
-            <p class="mb-1 text-start"><strong class="text-muted">Vòng thi:</strong> <span id="m_round"></span></p>
-            <p class="mb-3 text-start"><strong class="text-muted">Ngày thi:</strong> <span id="m_date"></span></p>
+            <p class="mb-3 text-start"><strong class="text-muted">Vòng thi:</strong> <span id="m_round"></span></p>
             <a id="m_drive_link" href="#" target="_blank" class="btn btn-outline-primary btn-sm mb-3">Mở ảnh rỗng Drive</a>
             <img id="m_image" class="w-100 bg-light rounded" alt="Ảnh kết quả chưa tải được">
           </div>
@@ -203,7 +198,6 @@
       let historyData = [];
 
       window.onload = () => {
-        document.getElementById('dateInput').valueAsDate = new Date();
         google.script.run.withSuccessHandler(populateStaff).getStaffData();
       };
 
@@ -294,7 +288,7 @@
             msnv: msnvVal,
             name: nameVal,
             round: document.getElementById('roundSelect').value,
-            date: document.getElementById('dateInput').value,
+            date: '',
             imageBase64: e.target.result
           };
 
@@ -353,7 +347,6 @@
                 <h6 class="mb-1 fw-bold text-primary">${item.name} <span class="badge bg-secondary ms-1">${item.msnv}</span></h6>
                 <div class="small text-muted d-flex gap-3">
                   <span>${item.round}</span>
-                  <span>Ngày: ${item.date}</span>
                 </div>
               </div>
               <span class="badge bg-success-subtle text-success">Đã nộp</span>
@@ -373,7 +366,6 @@
         document.getElementById('m_msnv').innerText = item.msnv;
         document.getElementById('m_name').innerText = item.name;
         document.getElementById('m_round').innerText = item.round;
-        document.getElementById('m_date').innerText = item.date;
         document.getElementById('m_drive_link').href = item.link || '#';
         
         const img = document.getElementById('m_image');

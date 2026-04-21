@@ -49,7 +49,6 @@ export default function HistoryView() {
           <table className="w-full text-left border-collapse">
             <thead className="sticky top-0 bg-white border-b border-slate-100">
               <tr className="text-[10px] text-slate-400 uppercase font-bold tracking-tighter">
-                <th className="pb-3 pt-0 px-2 lg:px-4">Thời gian</th>
                 <th className="pb-3 pt-0 px-2 lg:px-4 hidden sm:table-cell">MSNV</th>
                 <th className="pb-3 pt-0 px-2 lg:px-4">Họ và tên</th>
                 <th className="pb-3 pt-0 px-2 lg:px-4">Vòng</th>
@@ -62,7 +61,6 @@ export default function HistoryView() {
                   onClick={() => setSelectedItem(item)}
                   className="hover:bg-blue-50/50 cursor-pointer transition-colors border-b border-slate-50 group"
                 >
-                  <td className="py-3 px-2 lg:px-4 text-slate-400 whitespace-nowrap">{item.date}</td>
                   <td className="py-3 px-2 lg:px-4 font-mono text-blue-600 hidden sm:table-cell">{item.msnv}</td>
                   <td className="py-3 px-2 lg:px-4 text-slate-800 font-semibold group-hover:text-blue-700">
                      {item.name}
@@ -99,10 +97,6 @@ export default function HistoryView() {
               <div className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-lg">
                  <span className="text-xs text-slate-500 font-bold uppercase">Vòng thi</span>
                  <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs font-bold">{selectedItem.round}</span>
-              </div>
-              <div className="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-lg">
-                 <span className="text-xs text-slate-500 font-bold uppercase">Ngày nộp</span>
-                 <span className="font-medium">{selectedItem.date}</span>
               </div>
             </div>
             

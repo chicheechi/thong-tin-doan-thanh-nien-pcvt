@@ -14,8 +14,4 @@ export const mockStaff = [
   { id: '012621', name: 'Vũ Thanh Nguyên', department: 'Phòng Quản lý Đầu tư' },
 ];
 
-export const mockHistory = [
-  { msnv: '012682', name: 'Vũ Huỳnh Thảo My', round: 'Tuần 01', date: '2026-04-20', label: '10:15 - 20/04/26' },
-  { msnv: '012700', name: 'Phạm Minh Hòa', round: 'Tuần 01', date: '2026-04-19', label: '09:30 - 19/04/26' },
-  { msnv: '012621', name: 'Vũ Thanh Nguyên', round: 'Tuần 02', date: '2026-04-18', label: '14:20 - 18/04/26' },
-];
+export const mockHistory: any[] = [];
