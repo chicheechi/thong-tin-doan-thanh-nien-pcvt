@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, ExternalLink } from 'lucide-react';
-import { mockHistory } from '../mockData';
+import { apiService } from '../services/api';
 
 export default function HistoryView() {
   const [filterMSNV, setFilterMSNV] = useState('');
   const [filterRound, setFilterRound] = useState('');
-  const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string} | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string} | null>(null);
+  
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filtered = mockHistory.filter(item => {
-    const matchMsnv = item.msnv.toLowerCase().includes(filterMSNV.toLowerCase()) || item.name.toLowerCase().includes(filterMSNV.toLowerCase());
+  useEffect(() => {
+    apiService.getHistory().then(data => {
+      setHistoryData(data);
+      setLoading(false);
+    });
+  }, []);
+
+  const filtered = historyData.filter(item => {
+    const matchMsnv = (item.msnv || '').toString().toLowerCase().includes(filterMSNV.toLowerCase()) || 
+                      (item.name || '').toString().toLowerCase().includes(filterMSNV.toLowerCase());
     const matchRound = filterRound === '' || item.round === filterRound;
     return matchMsnv && matchRound;
   });
@@ -18,7 +29,7 @@ export default function HistoryView() {
       <div className="flex flex-wrap gap-2 items-center justify-between mb-4">
         <div>
            <h2 className="font-bold text-slate-800 uppercase text-xs tracking-wider">Lịch sử nộp bài</h2>
-           <p className="text-[10px] text-slate-400 mt-1 uppercase">Dữ liệu cập nhật từ Google Sheets</p>
+           <p className="text-[10px] text-slate-400 mt-1 uppercase">Dữ liệu cập nhật từ Google Sheets API</p>
         </div>
         <div className="flex gap-2 items-center">
           <select 
@@ -43,7 +54,12 @@ export default function HistoryView() {
       </div>
 
       <div className="flex-grow overflow-auto flex flex-col">
-        {filtered.length === 0 ? (
+        {loading ? (
+           <div className="text-center py-10 text-slate-400 text-sm font-medium flex flex-col items-center">
+             <div className="w-6 h-6 border-2 border-blue-500 border-t-transparent rounded-full animate-spin mb-3"></div>
+             Đang tải dữ liệu từ Google Sheets...
+           </div>
+        ) : filtered.length === 0 ? (
           <div className="text-center py-10 text-slate-400 text-sm font-medium">Không tìm thấy dữ liệu.</div>
         ) : (
           <table className="w-full text-left border-collapse">
@@ -100,10 +116,10 @@ export default function HistoryView() {
               </div>
             </div>
             
-            <div className="mt-5 border-2 border-dashed border-slate-200 rounded-xl p-6 bg-slate-50 flex flex-col items-center justify-center text-center">
-               <ExternalLink size={28} className="text-slate-300 mb-2" />
-               <p className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">(Mô phỏng đường dẫn Drive)</p>
-            </div>
+            <a href={selectedItem.link || '#'} target="_blank" rel="noreferrer" className="mt-5 border-2 border-dashed border-blue-200 hover:border-blue-500 rounded-xl p-6 bg-blue-50 flex flex-col items-center justify-center text-center group transition-colors block cursor-pointer">
+               <ExternalLink size={28} className="text-blue-400 group-hover:text-blue-600 mb-2 transition-colors" />
+               <p className="text-[11px] text-blue-600 font-bold uppercase tracking-wider">Mở ảnh Drive</p>
+            </a>
             
             <button className="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-2.5 mt-5 rounded-xl uppercase text-xs tracking-widest transition-colors" onClick={() => setSelectedItem(null)}>
               Đóng

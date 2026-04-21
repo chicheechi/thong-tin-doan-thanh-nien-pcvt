@@ -1,20 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Upload } from 'lucide-react';
-import { mockStaff } from '../mockData';
+import { apiService } from '../services/api';
 
 export default function FormView() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [msg, setMsg] = useState('');
   
+  const [staffData, setStaffData] = useState<any[]>([]);
   const [departments, setDepartments] = useState<string[]>([]);
   const [selectedDept, setSelectedDept] = useState('');
   const [selectedName, setSelectedName] = useState('');
   const [calculatedMsnv, setCalculatedMsnv] = useState('');
+  
+  const [round, setRound] = useState('');
+  const [imageBase64, setImageBase64] = useState('');
+  const [previewSrc, setPreviewSrc] = useState('');
 
   useEffect(() => {
-    // Extract unique departments from mock data
-    const depts = Array.from(new Set(mockStaff.map(s => s.department)));
-    setDepartments(depts);
+    // Tải dữ liệu thật từ Google Sheets thông qua API
+    apiService.getStaff().then(data => {
+      setStaffData(data);
+      const depts = Array.from(new Set(data.map((s: any) => s.department))).filter(Boolean) as string[];
+      setDepartments(depts);
+    });
   }, []);
 
   const handleDeptChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -26,7 +35,7 @@ export default function FormView() {
   const handleNameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const val = e.target.value;
     setSelectedName(val);
-    const found = mockStaff.find(s => s.department === selectedDept && s.name === val);
+    const found = staffData.find(s => s.department === selectedDept && s.name === val);
     if (found) {
       setCalculatedMsnv(found.id);
     } else {
@@ -34,32 +43,73 @@ export default function FormView() {
     }
   };
 
-  const filteredStaff = mockStaff.filter(s => s.department === selectedDept);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setImageBase64(event.target?.result as string);
+        setPreviewSrc(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const filteredStaff = staffData.filter(s => s.department === selectedDept);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!calculatedMsnv) {
       alert("Vui lòng chọn Họ và tên có sẵn trong danh sách (để tự động điền Số hiệu) trước khi nộp!");
       return;
     }
+    if (!imageBase64) {
+      alert("Vui lòng tải lên ảnh minh chứng!");
+      return;
+    }
+
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    setMsg('');
+    
+    const payload = {
+      msnv: calculatedMsnv,
+      name: selectedName,
+      department: selectedDept,
+      round: round,
+      date: '',
+      imageBase64: imageBase64
+    };
+
+    const res = await apiService.submitResult(payload);
+    
+    setLoading(false);
+    if (res.success) {
       setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    }, 1500);
+      setMsg(res.message);
+      // Reset form
+      setSelectedDept('');
+      setSelectedName('');
+      setCalculatedMsnv('');
+      setRound('');
+      setImageBase64('');
+      setPreviewSrc('');
+      
+      setTimeout(() => setSuccess(false), 5000);
+    } else {
+      alert(res.message || "Đã xảy ra lỗi");
+    }
   };
 
   return (
     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.1)] flex-grow flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-slate-800 uppercase text-xs tracking-wider">Biểu mẫu nộp kết quả</h2>
-        <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">TAB 1</span>
+        <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">XỬ LÝ QUA API</span>
       </div>
 
       {success && (
-        <div className="bg-green-50 text-green-700 p-3 rounded-lg mb-5 text-sm font-medium border border-green-100">
-          Nộp kết quả thành công! (Mô phỏng)
+        <div className="bg-green-50 text-green-700 p-3 rounded-lg mb-5 text-sm font-medium border border-green-100/50">
+          {msg}
         </div>
       )}
 
@@ -70,9 +120,10 @@ export default function FormView() {
             className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium"
             value={selectedDept}
             onChange={handleDeptChange}
+            disabled={departments.length === 0}
             required
           >
-            <option value="">-- Chọn phòng ban --</option>
+            <option value="">{departments.length === 0 ? "Đang xách dữ liệu từ Google Sheet..." : "-- Chọn phòng ban --"}</option>
             {departments.map((dept, idx) => (
               <option key={idx} value={dept}>{dept}</option>
             ))}
@@ -111,7 +162,12 @@ export default function FormView() {
 
         <div className="space-y-1.5 mb-4">
           <label className="block text-[11px] font-semibold text-slate-600 uppercase">Vòng thi</label>
-          <select className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium" required>
+          <select 
+            className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-medium" 
+            value={round}
+            onChange={(e) => setRound(e.target.value)}
+            required
+          >
             <option value="">-- Chọn tuần thi --</option>
             <option value="Tuần 01">Tuần 01 (15/4 - 22/4/2026)</option>
             <option value="Tuần 02">Tuần 02 (23/4 - 29/4/2026)</option>
@@ -126,25 +182,32 @@ export default function FormView() {
             <input 
               type="file" 
               accept="image/*" 
+              onChange={handleFileChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
-              required 
+              required={!previewSrc} 
             />
-            <div className="flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors pointer-events-none py-4">
-               <Upload className="mb-2" strokeWidth={1.5} size={32} />
-               <span className="text-xs font-medium">Chạm để chụp màn hình hoặc chọn ảnh</span>
-            </div>
+            {!previewSrc ? (
+              <div className="flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors pointer-events-none py-4">
+                 <Upload className="mb-2" strokeWidth={1.5} size={32} />
+                 <span className="text-xs font-medium">Chạm để chụp màn hình hoặc chọn ảnh</span>
+              </div>
+            ) : (
+              <div className="relative z-0">
+                <img src={previewSrc} alt="Preview" className="max-h-40 mx-auto rounded-lg shadow-sm" />
+              </div>
+            )}
           </div>
         </div>
 
         <button 
           type="submit" 
-          disabled={loading}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 mt-2 rounded-xl transition-colors shadow-lg shadow-blue-200 uppercase text-sm tracking-widest flex justify-center items-center gap-2"
+          disabled={loading || departments.length === 0}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3.5 mt-2 rounded-xl transition-colors shadow-lg shadow-blue-200 uppercase text-sm tracking-widest flex justify-center items-center gap-2 disabled:bg-blue-300"
         >
           {loading && (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
           )}
-          {loading ? 'ĐANG GỬI...' : 'GỬI KẾT QUẢ NGAY'}
+          {loading ? 'ĐANG GỬI LÊN DRIVE...' : 'GỬI KẾT QUẢ NGAY'}
         </button>
       </form>
     </div>

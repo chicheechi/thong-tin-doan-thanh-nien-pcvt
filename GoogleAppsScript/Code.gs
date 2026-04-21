@@ -62,7 +62,7 @@ function uploadResult(payload) {
 
     let fileUrl = '';
     if (payload.imageBase64) {
-      fileUrl = saveImage(payload.imageBase64, payload.msnv, payload.round);
+      fileUrl = saveImage(payload.imageBase64, payload.msnv, payload.round, payload.department, payload.name);
     }
 
     sheet.appendRow([
@@ -80,21 +80,42 @@ function uploadResult(payload) {
   }
 }
 
-function saveImage(base64Data, msnv, round) {
+function saveImage(base64Data, msnv, round, department, name) {
   const splitBase = base64Data.split(',');
   const type = splitBase[0].split(';')[0].replace('data:', '');
   const byteCharacters = Utilities.base64Decode(splitBase[1]);
   const blob = Utilities.newBlob(byteCharacters, type, msnv + '_' + round + '_' + new Date().getTime());
 
-  let folders = DriveApp.getFoldersByName(IMAGE_FOLDER_NAME);
-  let folder;
-  if (folders.hasNext()) {
-    folder = folders.next();
+  // 1. Thư mục gốc
+  let rootFolders = DriveApp.getFoldersByName(IMAGE_FOLDER_NAME);
+  let rootFolder;
+  if (rootFolders.hasNext()) {
+    rootFolder = rootFolders.next();
   } else {
-    folder = DriveApp.createFolder(IMAGE_FOLDER_NAME);
+    rootFolder = DriveApp.createFolder(IMAGE_FOLDER_NAME);
   }
 
-  const file = folder.createFile(blob);
+  // 2. Thư mục Phòng ban
+  let deptName = department ? department : 'Khác';
+  let deptFolders = rootFolder.getFoldersByName(deptName);
+  let deptFolder;
+  if (deptFolders.hasNext()) {
+    deptFolder = deptFolders.next();
+  } else {
+    deptFolder = rootFolder.createFolder(deptName);
+  }
+
+  // 3. Thư mục Cá nhân (MSNV - Họ Tên)
+  let empFolderName = msnv + ' - ' + name;
+  let empFolders = deptFolder.getFoldersByName(empFolderName);
+  let empFolder;
+  if (empFolders.hasNext()) {
+    empFolder = empFolders.next();
+  } else {
+    empFolder = deptFolder.createFolder(empFolderName);
+  }
+
+  const file = empFolder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
   return file.getUrl();
 }
