@@ -48,8 +48,31 @@ export default function FormView() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
-        setImageBase64(event.target?.result as string);
-        setPreviewSrc(event.target?.result as string);
+        const img = new Image();
+        img.onload = () => {
+          // Tạo Canvas để nén ảnh
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Giới hạn chiều rộng tối đa 1024px để giảm dung lượng nhưng vẫn đủ rõ
+          const MAX_WIDTH = 1024;
+          if (width > MAX_WIDTH) {
+            height = Math.round((height * MAX_WIDTH) / width);
+            width = MAX_WIDTH;
+          }
+
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+
+          // Nén ảnh về định dạng JPEG với chất lượng 0.7 (rất nhẹ nhưng vẫn nét)
+          const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+          setImageBase64(compressedBase64);
+          setPreviewSrc(compressedBase64);
+        };
+        img.src = event.target?.result as string;
       };
       reader.readAsDataURL(file);
     }
