@@ -104,7 +104,6 @@ export default function FormView() {
     <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-[0_1px_3px_rgba(0,0,0,0.1)] flex-grow flex flex-col">
       <div className="flex items-center justify-between mb-4">
         <h2 className="font-bold text-slate-800 uppercase text-xs tracking-wider">Biểu mẫu nộp kết quả</h2>
-        <span className="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold">XỬ LÝ QUA API</span>
       </div>
 
       {success && (

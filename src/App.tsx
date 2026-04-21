@@ -11,14 +11,17 @@ export default function App() {
       <div className="max-w-6xl mx-auto w-full p-4 sm:p-6 flex-grow flex flex-col">
         <header className="flex items-center justify-between mb-6 flex-wrap gap-4 pt-2">
           <div className="flex items-center gap-3">
-            <div className="bg-blue-600 p-2.5 rounded-xl shadow-sm shadow-blue-200">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
+            <div className="bg-white p-1 rounded-lg shadow-sm border border-slate-100 flex items-center justify-center overflow-hidden">
+              <img 
+                src="https://lh3.googleusercontent.com/d/1saQ-Dwts6HvnqPMjM6xvQF7CWxGtddlN" 
+                alt="Logo" 
+                className="h-12 w-auto object-contain"
+                referrerPolicy="no-referrer"
+              />
             </div>
             <div>
-              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">Thu Thập Kết Quả Thi PCVT</h1>
-              <p className="text-xs sm:text-sm text-slate-500 font-medium">Cổng thông tin nội bộ cho Đoàn viên</p>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight leading-tight">Thu Thập Kết Quả Thi</h1>
+              <p className="text-xs sm:text-sm text-slate-500 font-medium">Đoàn Thanh niên PCVT</p>
             </div>
           </div>
           
