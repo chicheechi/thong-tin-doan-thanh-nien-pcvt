@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Upload, ChevronDown, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Upload, ChevronDown, CheckCircle2, AlertCircle, ShieldCheck, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { apiService } from '../services/api';
+import { GoogleGenAI, Type } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 export default function FormView({ staffData, onSubmitted }: { staffData: any[], onSubmitted: () => void }) {
   const [loading, setLoading] = useState(false);
+  const [validating, setValidating] = useState(false);
   const [success, setSuccess] = useState(false);
   const [msg, setMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
   
   const [departments, setDepartments] = useState<string[]>([]);
   const [selectedDept, setSelectedDept] = useState('');
@@ -16,6 +21,63 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
   const [round, setRound] = useState('');
   const [imageBase64, setImageBase64] = useState('');
   const [previewSrc, setPreviewSrc] = useState('');
+
+  const validateImageWithAI = async (base64: string, name: string) => {
+    try {
+      setValidating(true);
+      setErrorMsg('');
+      
+      const cleanBase64 = base64.split(',')[1] || base64;
+      
+      const prompt = `Bạn là một chuyên gia kiểm duyệt chứng chỉ nội bộ công ty. 
+      Nhiệm vụ: Kiểm tra bức ảnh này có phải là chứng nhận hoàn thành nội dung cuộc thi hay không.
+      
+      Tiêu chí hợp lệ:
+      1. BẮT BUỘC có cụm từ "ĐÃ HOÀN THÀNH NỘI DUNG" (Hoặc tương đương) VÀ chữ "CHỨNG NHẬN" trên ảnh.
+      2. Tên trong chứng nhận PHẢI khớp với tên: "${name}". (Chấp nhận viết hoa/thường, có dấu/không dấu).
+      3. Bỏ qua mọi yếu tố về kích thước ảnh, tỷ lệ khung hình hay bố cục. Chỉ cần trên ảnh có chứa đầy đủ các chữ theo yêu cầu là HỢP LỆ.
+      4. Nếu ảnh chỉ có điểm kết quả trắc nghiệm hoặc là ảnh đang làm bài thi mà KHÔNG CÓ chữ CHỨNG NHẬN -> KHÔNG HỢP LỆ.
+      
+      Xử lý nghiêm ngặt: Nếu không đủ 2 cột mốc "CHỨNG NHẬN" và nội dung đã hoàn thành -> đánh failed.
+
+      Trả về kết quả theo định dạng JSON sau:
+      {
+        "isValid": boolean,
+        "reason": string (Giải thích tại sao)
+      }`;
+
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: [
+          {
+            parts: [
+              { text: prompt },
+              { inlineData: { data: cleanBase64, mimeType: "image/jpeg" } }
+            ]
+          }
+        ],
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              isValid: { type: Type.BOOLEAN },
+              reason: { type: Type.STRING }
+            },
+            required: ["isValid", "reason"]
+          }
+        }
+      });
+
+      const result = JSON.parse(response.text || '{}');
+      return result;
+    } catch (error) {
+      console.error("AI Validation Error:", error);
+      return { isValid: true, reason: "Bỏ qua xác thực do lỗi hệ thống" }; // Fail safe để người dùng vẫn nộp được nếu AI lỗi
+    } finally {
+      setValidating(false);
+    }
+  };
 
   useEffect(() => {
     if (staffData.length > 0) {
@@ -28,6 +90,7 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
     setSelectedDept(e.target.value);
     setSelectedName('');
     setCalculatedMsnv('');
+    setErrorMsg('');
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -39,10 +102,12 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
     } else {
       setCalculatedMsnv('');
     }
+    setErrorMsg('');
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setErrorMsg('');
     if (file) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -74,25 +139,41 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMsg('');
+    
     if (!selectedDept || !selectedName || !calculatedMsnv || !round) {
-      alert("Vui lòng điền đầy đủ thông tin vào các trường bắt buộc!");
+      setErrorMsg("Vui lòng điền đầy đủ thông tin vào các trường bắt buộc!");
       return;
     }
     if (!imageBase64) {
-      alert("Vui lòng tải lên ảnh minh chứng kết quả!");
+      setErrorMsg("Vui lòng tải lên ảnh minh chứng kết quả!");
       return;
     }
 
     setLoading(true);
     setMsg('');
     
+    // AI VALIDATION STEP
+    const validation = await validateImageWithAI(imageBase64, selectedName);
+    
+    // Save to local storage so HistoryView can read it
+    try {
+       localStorage.setItem(`validation_${calculatedMsnv}_${round}`, JSON.stringify({
+          isValid: validation.isValid,
+          reason: validation.reason,
+          timestamp: Date.now()
+       }));
+    } catch(e) {}
+
     const payload = {
       msnv: calculatedMsnv,
       name: selectedName,
       department: selectedDept,
       round: round,
       date: '',
-      imageBase64: imageBase64
+      imageBase64: imageBase64,
+      isValid: validation.isValid ? 'True' : 'False',
+      validationReason: validation.reason
     };
 
     const res = await apiService.submitResult(payload);
@@ -101,9 +182,12 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
     
     if (res.success) {
       setSuccess(true);
-      setMsg("Gửi kết quả thành công");
-      
-      // Notify parent to fetch new history (optional, user asked for F5 but seeing own submission is good)
+      if (validation.isValid) {
+         setMsg("Gửi kết quả thành công và ảnh chứng nhận HỢP LỆ!");
+         setErrorMsg('');
+      } else {
+         setErrorMsg(`Đã gửi kết quả, nhưng ảnh tải lên bị AI đánh giá KHÔNG HỢP LỆ: ${validation.reason}`);
+      }
       onSubmitted();
 
       // Reset form
@@ -114,9 +198,12 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
       setImageBase64('');
       setPreviewSrc('');
       
-      setTimeout(() => setSuccess(false), 5000);
+      setTimeout(() => {
+         setSuccess(false);
+         setErrorMsg('');
+      }, 7000);
     } else {
-      alert("Có lỗi xảy ra: " + res.message);
+      setErrorMsg("Có lỗi xảy ra: " + res.message);
     }
   };
 
@@ -143,6 +230,18 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
             {msg}
           </motion.div>
         )}
+        
+        {errorMsg && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginBottom: 20 }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+            className="bg-rose-50 text-rose-700 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold border border-rose-100 shadow-sm"
+          >
+            <ShieldAlert size={18} />
+            {errorMsg}
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -156,7 +255,7 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
               className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-800 transition-all appearance-none cursor-pointer"
               value={selectedDept}
               onChange={handleDeptChange}
-              disabled={departments.length === 0}
+              disabled={departments.length === 0 || loading || validating}
               required
             >
               <option value="">{departments.length === 0 ? "Đang tải dữ liệu..." : "-- Chọn đơn vị --"}</option>
@@ -166,11 +265,6 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
             </select>
             <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors" size={16} />
           </div>
-          {departments.length === 0 && (
-             <p className="text-[10px] text-blue-500 mt-1 font-bold italic animate-pulse flex items-center gap-1.5">
-               <AlertCircle size={12} /> Đang kết nối dữ liệu từ hệ thống vtlc...
-             </p>
-          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
@@ -184,7 +278,7 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
                     className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-800 transition-all appearance-none cursor-pointer"
                     value={selectedName}
                     onChange={handleNameChange}
-                    disabled={!selectedDept}
+                    disabled={!selectedDept || loading || validating}
                     required 
                 >
                     <option value="">-- Chọn nhân sự --</option>
@@ -218,6 +312,7 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
               className="w-full bg-slate-50 border-2 border-slate-100 rounded-xl px-4 py-3 text-sm focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-800 transition-all appearance-none cursor-pointer" 
               value={round}
               onChange={(e) => setRound(e.target.value)}
+              disabled={loading || validating}
               required
             >
               <option value="">-- Chọn tuần thi hiện tại --</option>
@@ -244,6 +339,7 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
               accept="image/*" 
               onChange={handleFileChange}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+              disabled={loading || validating}
               required={!previewSrc}
             />
             {!previewSrc ? (
@@ -271,18 +367,26 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
 
         <motion.button 
           type="submit" 
-          disabled={loading || !imageBase64}
+          disabled={loading || validating || !imageBase64}
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 mt-6 rounded-[24px] shadow-2xl shadow-blue-500/30 uppercase text-sm tracking-[0.2em] flex justify-center items-center gap-3 disabled:opacity-50 disabled:shadow-none transition-all"
         >
-          {loading ? (
+          {validating ? (
+            <>
+              <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>AI Đang kiểm tra ảnh...</span>
+            </>
+          ) : loading ? (
             <>
               <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
               <span>Đang Tải Lên...</span>
             </>
           ) : (
-            'Xác nhận Nộp Kết Quả'
+            <>
+              <ShieldCheck size={20} />
+              <span>Xác nhận Nộp Kết Quả</span>
+            </>
           )}
         </motion.button>
       </form>

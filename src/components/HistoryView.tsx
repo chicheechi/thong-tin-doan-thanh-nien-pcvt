@@ -6,42 +6,78 @@ import { apiService } from '../services/api';
 export default function HistoryView({ historyData }: { historyData: any[] }) {
   const [filterMSNV, setFilterMSNV] = useState('');
   const [filterRound, setFilterRound] = useState('');
-  const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string, department:string} | null>(null);
+  const [activeTab, setActiveTab] = useState<'all' | 'valid' | 'invalid'>('all');
+  const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string, department:string, isValid?: boolean, reason?: string} | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   
   const loading = false; // Data is managed by parent App.tsx
 
-  const filtered = historyData.filter(item => {
+  const enrichedData = historyData.map(item => {
+    let isValid = null;
+    let reason = '';
+    try {
+        const stored = localStorage.getItem(`validation_${item.msnv}_${item.round}`);
+        if (stored) {
+            const parsed = JSON.parse(stored);
+            isValid = parsed.isValid;
+            reason = parsed.reason;
+        }
+    } catch(e) {}
+    
+    // Fallback to item property if loaded from API
+    if (isValid === null && item.isValid !== undefined) {
+       isValid = (item.isValid === 'True' || item.isValid === true);
+       reason = item.validationReason || (isValid ? 'Hợp lệ' : 'Không hợp lệ');
+    }
+
+    // Default for old data before AI was integrated
+    if (isValid === null) {
+        isValid = true;
+        reason = 'Hợp lệ (Được ghi nhận từ hệ thống cũ)';
+    }
+    return { ...item, isValid, reason };
+  });
+
+  const filtered = enrichedData.filter(item => {
     const matchMsnv = (item.msnv || '').toString().toLowerCase().includes(filterMSNV.toLowerCase()) || 
                       (item.name || '').toString().toLowerCase().includes(filterMSNV.toLowerCase());
     const matchRound = filterRound === '' || item.round === filterRound;
-    return matchMsnv && matchRound;
+    
+    let matchTab = true;
+    if (activeTab === 'valid') matchTab = item.isValid === true;
+    if (activeTab === 'invalid') matchTab = item.isValid === false;
+
+    return matchMsnv && matchRound && matchTab;
   });
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterMSNV, filterRound]);
+  }, [filterMSNV, filterRound, activeTab]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginatedData = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+  const getStatusBadge = (isValid: boolean) => {
+     if (isValid) return <span className="bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full font-black text-[9px] uppercase tracking-widest shadow-sm border border-emerald-200">Hợp lệ</span>;
+     return <span className="bg-rose-100 text-rose-700 px-2.5 py-1 rounded-full font-black text-[9px] uppercase tracking-widest shadow-sm border border-rose-200">Không hợp lệ</span>;
+  }
+
   return (
     <motion.div 
       whileHover={{ y: -4 }}
-      className="bg-white border border-white rounded-[32px] sm:rounded-[40px] p-6 lg:p-10 shadow-2xl shadow-blue-900/5 flex-grow flex flex-col h-full transition-all relative overflow-hidden"
+      className="bg-white border border-white rounded-[32px] sm:rounded-[40px] p-6 lg:p-10 shadow-2xl shadow-blue-900/5 transition-all relative overflow-hidden"
     >
       <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-blue-400 via-blue-600 to-transparent"></div>
       
-      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 items-start xl:items-center justify-between mb-8 sm:mb-10 w-full">
+      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 items-start xl:items-center justify-between mb-6 w-full">
         <div className="flex items-center gap-3">
            <div className="p-2.5 bg-blue-50 rounded-2xl text-blue-600 shadow-inner">
               <History size={20} />
            </div>
            <div>
               <h2 className="font-black text-slate-800 uppercase text-base tracking-[0.1em] font-display">Lịch Sử Hoàn Thành</h2>
-
            </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 items-stretch md:items-center w-full sm:w-auto h-full sm:ml-auto">
@@ -73,6 +109,27 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
         </div>
       </div>
 
+      <div className="flex items-center gap-2 mb-6 border-b border-slate-100 pb-4 overflow-x-auto custom-scrollbar">
+        <button 
+           onClick={() => setActiveTab('all')}
+           className={`px-4 py-2 mt-1 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'all' ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800'}`}
+        >
+          Đã nộp ({enrichedData.length})
+        </button>
+        <button 
+           onClick={() => setActiveTab('valid')}
+           className={`px-4 py-2 mt-1 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'valid' ? 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800'}`}
+        >
+          Có chứng nhận ({enrichedData.filter(i => i.isValid).length})
+        </button>
+        <button 
+           onClick={() => setActiveTab('invalid')}
+           className={`px-4 py-2 mt-1 rounded-full text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${activeTab === 'invalid' ? 'bg-rose-500 text-white shadow-md shadow-rose-500/20' : 'bg-slate-50 text-slate-500 hover:bg-slate-100 hover:text-slate-800'}`}
+        >
+          Chưa có chứng nhận ({enrichedData.filter(i => !i.isValid).length})
+        </button>
+      </div>
+
       <div className="flex-grow overflow-auto flex flex-col custom-scrollbar pr-2 -mr-2">
         {loading ? (
            <div className="text-center py-24 text-slate-400 text-sm font-bold flex flex-col items-center">
@@ -93,6 +150,7 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
               <tr className="text-[9px] md:text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
                 <th className="pb-3 pt-0 px-3 md:px-4">Số hiệu</th>
                 <th className="pb-3 pt-0 px-3 md:px-4 font-sans">Nhân sự</th>
+                <th className="pb-3 pt-0 px-3 md:px-4 font-sans text-center">Xác thực AI</th>
                 <th className="pb-3 pt-0 px-3 md:px-4 font-sans text-right">Tuần</th>
               </tr>
             </thead>
@@ -114,6 +172,9 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                         <span className="text-slate-800 text-xs md:text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
                         <span className="text-[8px] md:text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || '...'}</span>
                      </div>
+                  </td>
+                  <td className="py-3 px-3 md:px-4 text-center">
+                     {getStatusBadge(item.isValid)}
                   </td>
                   <td className="py-3 px-3 md:px-4 last:rounded-r-xl text-right">
                     <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[8px] md:text-[9px] uppercase tracking-widest shadow-md shadow-blue-500/10 font-sans">
@@ -176,76 +237,85 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                onClick={() => setSelectedItem(null)} 
             />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-sm p-6 sm:p-8 relative shadow-2xl border border-white overflow-hidden font-sans" 
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              className="bg-white rounded-[24px] w-full max-w-sm p-5 sm:p-6 relative shadow-2xl border border-white overflow-hidden font-sans m-auto" 
               onClick={e => e.stopPropagation()}
             >
-              <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600"></div>
+              <div className="absolute top-0 left-0 w-full h-1 bg-blue-600"></div>
               
-              <button className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-all" onClick={() => setSelectedItem(null)}>
-                <X size={20} />
+              <button className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-all" onClick={() => setSelectedItem(null)}>
+                <X size={18} />
               </button>
 
-              <div className="mb-8">
-                <h3 className="font-black text-lg tracking-tight uppercase text-slate-800 font-display">Chi Tiết Kết Quả</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 font-sans">Hồ sơ nộp bài trực tuyến</p>
+              <div className="mb-5">
+                <h3 className="font-black text-base tracking-tight uppercase text-slate-800 font-display">Chi Tiết Kết Quả</h3>
+                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 font-sans">Hồ sơ nộp bài trực tuyến</p>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                   <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                      <User size={20} />
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                   <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-blue-600">
+                      <User size={16} />
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Nhân sự</span>
-                      <span className="font-bold text-slate-800 text-sm font-sans">{selectedItem.name} ({selectedItem.msnv})</span>
+                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1 font-sans">Nhân sự</span>
+                      <span className="font-bold text-slate-800 text-xs font-sans">{selectedItem.name} ({selectedItem.msnv})</span>
                    </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                   <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                      <Info size={20} />
+                {selectedItem.isValid === false && (
+                    <div className="flex items-start gap-3 bg-rose-50 p-3 rounded-xl border border-rose-100">
+                       <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-rose-500 shrink-0">
+                          <Info size={16} />
+                       </div>
+                       <div className="flex flex-col">
+                          <span className="text-[9px] text-rose-400 font-black uppercase tracking-widest leading-none mb-1 font-sans mt-0.5">Lỗi Xác thực AI</span>
+                          <span className="font-bold text-rose-700 text-xs font-sans leading-relaxed">{selectedItem.reason}</span>
+                       </div>
+                    </div>
+                )}
+                
+                <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                   <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-blue-600">
+                      <Info size={16} />
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Phòng ban</span>
-                      <span className="font-bold text-slate-800 text-sm font-sans">{selectedItem.department || 'N/A'}</span>
+                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1 font-sans">Phòng ban</span>
+                      <span className="font-bold text-slate-800 text-xs font-sans">{selectedItem.department || 'N/A'}</span>
                    </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                   <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                      <Calendar size={20} />
+                <div className="flex items-center gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                   <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-blue-600">
+                      <Calendar size={16} />
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Thời điểm</span>
-                      <span className="font-bold text-slate-800 text-sm whitespace-nowrap font-sans">{selectedItem.round}</span>
+                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1 font-sans">Thời điểm</span>
+                      <span className="font-bold text-slate-800 text-xs whitespace-nowrap font-sans">{selectedItem.round}</span>
                    </div>
                 </div>
               </div>
               
               <motion.a 
-                whileHover={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 1.02 } : {}}
-                whileTap={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 0.98 } : {}}
+                whileHover={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 1.01 } : {}}
+                whileTap={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 0.99 } : {}}
                 href={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl || '#'} 
                 target="_blank" 
                 rel="noreferrer" 
-                className={`mt-8 border-2 border-dashed rounded-[24px] p-8 flex flex-col items-center justify-center text-center group transition-all block cursor-pointer group ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'border-blue-200 hover:border-blue-600 bg-blue-50/50' : 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'}`}
+                className={`mt-5 border-2 border-dashed rounded-[16px] p-5 flex flex-col items-center justify-center text-center group transition-all cursor-pointer ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'border-blue-200 hover:border-blue-600 bg-blue-50/50' : 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'}`}
               >
-                 <div className={`w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-4 transition-transform ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-600 group-hover:scale-110' : 'text-slate-300'}`}>
-                    <ExternalLink size={28} />
+                 <div className={`w-10 h-10 bg-white rounded-xl shadow-md flex items-center justify-center mb-2.5 transition-transform ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-600 group-hover:scale-110' : 'text-slate-300'}`}>
+                    <ExternalLink size={20} />
                  </div>
-                 <p className={`text-xs font-black uppercase tracking-[0.2em] font-sans ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-700' : 'text-slate-400'}`}>
+                 <p className={`text-[10px] font-black uppercase tracking-[0.15em] font-sans ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-700' : 'text-slate-400'}`}>
                    {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Xem Ảnh Minh Chứng' : 'Chưa có liên kết ảnh'}
-                 </p>
-                 <p className="text-[9px] text-blue-400 mt-2 font-bold italic tracking-wide font-sans">
-                   {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Mở rộng trong cửa sổ Drive mới' : 'Dữ liệu đang được đồng bộ...'}
                  </p>
               </motion.a>
               
               <button 
-                className="w-full bg-slate-900 hover:bg-black text-white font-black py-4 mt-8 rounded-2xl uppercase text-[10px] tracking-[0.2em] transition-all shadow-xl shadow-slate-900/10 font-sans" 
+                className="w-full bg-slate-900 hover:bg-black text-white font-black py-3 mt-5 rounded-xl uppercase text-[9px] tracking-[0.2em] transition-all shadow-lg shadow-slate-900/10 font-sans" 
                 onClick={() => setSelectedItem(null)}
               >
                 Đóng thông tin
