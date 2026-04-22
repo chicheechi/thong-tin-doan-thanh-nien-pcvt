@@ -71,7 +71,7 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <motion.div 
           whileHover={{ y: -4 }}
           className="bg-gradient-to-b from-white to-slate-50/50 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
@@ -98,15 +98,15 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
           whileHover={{ y: -4, scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowModal(true)}
-          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group cursor-pointer col-span-2 lg:col-span-1"
+          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group cursor-pointer sm:col-span-2 lg:col-span-1"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 text-white group-hover:scale-110 transition-transform">
             <UserMinus size={80} />
           </div>
           <p className="text-[9px] sm:text-[10px] font-black text-rose-100 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">CHƯA NỘP BÀI</p>
-          <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight relative z-10 flex items-center gap-2">
+          <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight relative z-10 flex items-center justify-between">
             {stats.unsubmittedCount} 
-            <span className="text-[8px] bg-white/20 px-2 py-0.5 rounded-full font-bold animate-pulse">XEM DANH SÁCH</span>
+            <span className="text-[8px] bg-white/20 px-2 py-1 rounded-full font-bold animate-pulse whitespace-nowrap">XEM DANH SÁCH</span>
           </h3>
         </motion.div>
       </div>
@@ -173,15 +173,15 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
                initial={{ opacity: 0, scale: 0.95, y: 20 }}
                animate={{ opacity: 1, scale: 1, y: 0 }}
                exit={{ opacity: 0, scale: 0.95, y: 20 }}
-               className="bg-white rounded-[40px] w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col relative z-10 shadow-2xl shadow-rose-900/20"
+               className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-4xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden flex flex-col relative z-10 shadow-2xl shadow-rose-900/20 m-2"
              >
-                <div className="p-8 pb-4 flex items-center justify-between">
+                <div className="p-5 sm:p-8 pb-4 flex items-center justify-between">
                    <div className="flex items-center gap-3">
                       <div className="p-3 bg-rose-50 rounded-2xl text-rose-500">
                         <UserMinus size={24} />
                       </div>
                       <div>
-                        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Nhân sự chưa nộp bài</h2>
+                        <h2 className="text-base sm:text-xl font-black text-slate-800 uppercase tracking-tight">Chi tiết chưa nộp</h2>
                         <p className="text-[10px] text-rose-500 font-black uppercase tracking-widest mt-1">{stats.unsubmittedCount} người cần hoàn thành</p>
                       </div>
                    </div>
@@ -193,7 +193,7 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
                    </button>
                 </div>
 
-                <div className="px-8 mb-6">
+                <div className="px-5 sm:px-8 mb-4 sm:mb-6">
                    <div className="relative group">
                      <Search size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
                      <input 
@@ -206,7 +206,7 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
                    </div>
                 </div>
 
-                <div className="flex-grow overflow-auto px-8 pb-10 custom-scrollbar">
+                <div className="flex-grow overflow-auto px-5 sm:px-8 pb-8 sm:pb-10 custom-scrollbar">
                    <div className="space-y-8">
                       {Object.entries(stats.unsubmittedByDept).map(([dept, list]) => {
                         const staffList = list as any[];

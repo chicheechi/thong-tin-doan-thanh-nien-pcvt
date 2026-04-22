@@ -52,15 +52,15 @@ export default function App() {
         <motion.header 
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex flex-col items-center justify-center mb-10 bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white relative overflow-hidden"
+          className="flex flex-col items-center justify-center mb-6 sm:mb-10 bg-white/80 backdrop-blur-xl p-4 sm:p-8 rounded-[32px] sm:rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white relative overflow-hidden"
         >
           {/* Subtle background element */}
           <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400"></div>
           
-          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 transition-all mb-8 w-full justify-center">
+          <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 transition-all mb-6 sm:mb-8 w-full justify-center text-center sm:text-left">
             <motion.div 
               whileHover={{ scale: 1.05, rotate: -2 }}
-              className="bg-white p-2 rounded-[24px] border border-slate-100 flex items-center justify-center overflow-hidden w-16 h-16 sm:w-24 sm:h-24 shrink-0 shadow-xl shadow-blue-900/5"
+              className="bg-white p-1.5 sm:p-2 rounded-[20px] sm:rounded-[24px] border border-slate-100 flex items-center justify-center overflow-hidden w-16 h-16 sm:w-20 lg:w-24 sm:h-20 lg:h-24 shrink-0 shadow-xl shadow-blue-900/5"
             >
               <img 
                 src="https://lh3.googleusercontent.com/d/1saQ-Dwts6HvnqPMjM6xvQF7CWxGtddlN" 
@@ -69,13 +69,13 @@ export default function App() {
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <div className="text-center sm:text-left max-w-3xl">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight font-display text-balance bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700">
+            <div className="max-w-3xl">
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight font-display text-balance bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700">
                 Thu thập kết quả Cuộc thi Tìm hiểu về cuộc đời và sự nghiệp của Tổng Bí thư Hà Huy Tập
               </h1>
-              <div className="flex items-center gap-3 mt-4 justify-center sm:justify-start">
-                <span className="w-10 h-[3px] bg-gradient-to-r from-blue-600 to-blue-400 rounded-full shadow-sm"></span>
-                <p className="text-[10px] sm:text-xs text-blue-600 font-black uppercase tracking-[0.3em]">Đoàn Thanh Niên PC Vũng Tàu</p>
+              <div className="flex items-center gap-3 mt-3 sm:mt-4 justify-center sm:justify-start">
+                <span className="w-8 sm:w-10 h-[2px] sm:h-[3px] bg-gradient-to-r from-blue-600 to-blue-400 rounded-full shadow-sm"></span>
+                <p className="text-[9px] sm:text-xs text-blue-600 font-black uppercase tracking-[0.2em] sm:tracking-[0.3em]">Đoàn Thanh Niên PC Vũng Tàu</p>
               </div>
             </div>
           </div>

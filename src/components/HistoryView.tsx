@@ -117,53 +117,90 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
             Không tìm thấy bản ghi phù hợp
           </motion.div>
         ) : (
-          <table className="w-full min-w-[450px] text-left border-separate border-spacing-y-2 font-sans">
-            <thead className="sticky top-0 bg-white z-10">
-              <tr className="text-[9px] md:text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
-                <th className="pb-3 pt-0 px-3 md:px-4">Số hiệu</th>
-                <th className="pb-3 pt-0 px-3 md:px-4 font-sans">Nhân sự</th>
-                <th className="pb-3 pt-0 px-3 md:px-4 font-sans text-center">Trạng Thái</th>
-                <th className="pb-3 pt-0 px-3 md:px-4 font-sans text-right">Tuần</th>
-              </tr>
-            </thead>
-            <tbody className="text-xs font-bold font-sans">
+          <div className="space-y-4">
+            {/* Desktop Table */}
+            <div className="hidden sm:block">
+              <table className="w-full text-left border-separate border-spacing-y-2 font-sans">
+                <thead className="sticky top-0 bg-white z-10">
+                  <tr className="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
+                    <th className="pb-3 pt-0 px-4">Số hiệu</th>
+                    <th className="pb-3 pt-0 px-4 font-sans">Nhân sự</th>
+                    <th className="pb-3 pt-0 px-4 font-sans text-center">Trạng Thái</th>
+                    <th className="pb-3 pt-0 px-4 font-sans text-right">Tuần</th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs font-bold font-sans">
+                  {paginatedData.map((item, idx) => (
+                    <motion.tr 
+                      key={idx} 
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.03 }}
+                      onClick={() => setSelectedItem(item)}
+                      className="bg-slate-50/50 hover:bg-blue-50/80 cursor-pointer transition-all group border border-transparent hover:border-blue-100 rounded-xl overflow-hidden font-sans"
+                    >
+                      <td className="py-3 px-4 font-mono text-blue-600 first:rounded-l-xl">
+                         <span className="bg-white px-1.5 py-0.5 rounded-lg border border-slate-100 shadow-sm text-xs">{item.msnv}</span>
+                      </td>
+                      <td className="py-3 px-4">
+                         <div className="flex flex-col">
+                            <span className="text-slate-800 text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
+                            <span className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || '...'}</span>
+                         </div>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                         {item.status ? (
+                            <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${item.status === 'Đã có chứng nhận' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                               {item.status}
+                            </span>
+                         ) : (
+                            <span className="text-[9px] text-slate-300 italic">Chưa phân loại</span>
+                         )}
+                      </td>
+                      <td className="py-3 px-4 last:rounded-r-xl text-right">
+                        <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[9px] uppercase tracking-widest shadow-md shadow-blue-500/10 font-sans">
+                          {item.round}
+                        </span>
+                      </td>
+                    </motion.tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card Layout */}
+            <div className="sm:hidden space-y-3">
               {paginatedData.map((item, idx) => (
-                <motion.tr 
-                  key={idx} 
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: idx * 0.03 }}
                   onClick={() => setSelectedItem(item)}
-                  className="bg-slate-50/50 hover:bg-blue-50/80 cursor-pointer transition-all group border border-transparent hover:border-blue-100 rounded-xl overflow-hidden font-sans"
+                  className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 active:bg-blue-50/80 transition-all flex flex-col gap-3"
                 >
-                  <td className="py-3 px-3 md:px-4 font-mono text-blue-600 first:rounded-l-xl">
-                     <span className="bg-white px-1.5 py-0.5 rounded-lg border border-slate-100 shadow-sm text-[10px] md:text-xs">{item.msnv}</span>
-                  </td>
-                  <td className="py-3 px-3 md:px-4">
-                     <div className="flex flex-col">
-                        <span className="text-slate-800 text-xs md:text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
-                        <span className="text-[8px] md:text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || '...'}</span>
-                        {item.timestamp && <span className="text-[8px] text-slate-300 mt-1">{item.timestamp}</span>}
-                     </div>
-                  </td>
-                  <td className="py-3 px-3 md:px-4 text-center">
-                     {item.status ? (
-                        <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${item.status === 'Đã có chứng nhận' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                           {item.status}
-                        </span>
-                     ) : (
-                        <span className="text-[9px] text-slate-300 italic">Chưa phân loại</span>
-                     )}
-                  </td>
-                  <td className="py-3 px-3 md:px-4 last:rounded-r-xl text-right">
-                    <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[8px] md:text-[9px] uppercase tracking-widest shadow-md shadow-blue-500/10 font-sans">
-                      {item.round}
-                    </span>
-                  </td>
-                </motion.tr>
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col">
+                      <span className="text-slate-800 text-sm font-display font-black uppercase">{item.name}</span>
+                      <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest mt-0.5">{item.department}</span>
+                    </div>
+                    <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[8px] uppercase tracking-widest">{item.round}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                    <span className="font-mono text-blue-600 text-[10px] font-black">{item.msnv}</span>
+                    {item.status ? (
+                      <span className={`px-2 py-0.5 rounded-md text-[8px] font-black uppercase tracking-widest ${item.status === 'Đã có chứng nhận' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                         {item.status}
+                      </span>
+                    ) : (
+                      <span className="text-[8px] text-slate-300 italic">Chưa phân loại</span>
+                    )}
+                  </div>
+                </motion.div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         )}
       </div>
 
