@@ -6,7 +6,7 @@ import { apiService } from '../services/api';
 export default function HistoryView() {
   const [filterMSNV, setFilterMSNV] = useState('');
   const [filterRound, setFilterRound] = useState('');
-  const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string} | null>(null);
+  const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string, department:string} | null>(null);
   
   const [historyData, setHistoryData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -113,7 +113,7 @@ export default function HistoryView() {
                   <td className="py-5 px-6">
                      <div className="flex flex-col">
                         <span className="text-slate-800 text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
-                        <span className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">Xác nhận hoàn thành</span>
+                        <span className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || 'Đang cập nhật...'}</span>
                      </div>
                   </td>
                   <td className="py-5 px-6 last:rounded-r-2xl text-right">
@@ -164,6 +164,16 @@ export default function HistoryView() {
                    <div className="flex flex-col">
                       <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Nhân sự</span>
                       <span className="font-bold text-slate-800 text-sm font-sans">{selectedItem.name} ({selectedItem.msnv})</span>
+                   </div>
+                </div>
+
+                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                   <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
+                      <Info size={20} />
+                   </div>
+                   <div className="flex flex-col">
+                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Phòng ban</span>
+                      <span className="font-bold text-slate-800 text-sm font-sans">{selectedItem.department || 'N/A'}</span>
                    </div>
                 </div>
 
