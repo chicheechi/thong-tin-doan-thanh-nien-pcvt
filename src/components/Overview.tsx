@@ -3,8 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Users, CheckCircle2, TrendingUp, Award, UserMinus, AlertCircle, X, Search } from 'lucide-react';
 import { apiService } from '../services/api';
 
-export default function Overview() {
-  const [loading, setLoading] = useState(true);
+export default function Overview({ staffData, historyData }: { staffData: any[], historyData: any[] }) {
+  const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [searchUnsubmitted, setSearchUnsubmitted] = useState('');
   const [stats, setStats] = useState({
@@ -21,54 +21,42 @@ export default function Overview() {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const [staff, history] = await Promise.all([
-          apiService.getStaff(),
-          apiService.getHistory()
-        ]);
+    const calculateStats = () => {
+      const totalStaff = staffData.length;
+      const totalSubmissions = historyData.length;
+      
+      // Find who hasn't submitted
+      const submittedSet = new Set(historyData.map((h: any) => h.msnv));
+      const unsubmittedStaff = staffData.filter((s: any) => !submittedSet.has(s.id));
+      
+      // Group by department
+      const unsubmittedByDept = unsubmittedStaff.reduce((acc: any, curr: any) => {
+        if (!acc[curr.department]) acc[curr.department] = [];
+        acc[curr.department].push(curr);
+        return acc;
+      }, {});
 
-        const totalStaff = staff.length;
-        const totalSubmissions = history.length;
-        
-        // Find who hasn't submitted
-        const submittedSet = new Set(history.map((h: any) => h.msnv));
-        const unsubmittedStaff = staff.filter((s: any) => !submittedSet.has(s.id));
-        
-        // Group by department
-        const unsubmittedByDept = unsubmittedStaff.reduce((acc: any, curr: any) => {
-          if (!acc[curr.department]) acc[curr.department] = [];
-          acc[curr.department].push(curr);
-          return acc;
-        }, {});
+      const roundCounts = historyData.reduce((acc: any, item: any) => {
+        const r = item.round || '';
+        if (r.includes('01')) acc['Tuần 01']++;
+        else if (r.includes('02')) acc['Tuần 02']++;
+        else if (r.includes('03')) acc['Tuần 03']++;
+        else if (r.includes('04')) acc['Tuần 04']++;
+        return acc;
+      }, { 'Tuần 01': 0, 'Tuần 02': 0, 'Tuần 03': 0, 'Tuần 04': 0 });
 
-        const roundCounts = history.reduce((acc: any, item: any) => {
-          const r = item.round || '';
-          if (r.includes('01')) acc['Tuần 01']++;
-          else if (r.includes('02')) acc['Tuần 02']++;
-          else if (r.includes('03')) acc['Tuần 03']++;
-          else if (r.includes('04')) acc['Tuần 04']++;
-          return acc;
-        }, { 'Tuần 01': 0, 'Tuần 02': 0, 'Tuần 03': 0, 'Tuần 04': 0 });
+      const rounds = [
+        { name: 'Tuần 01', count: roundCounts['Tuần 01'], percentage: totalStaff ? Math.round((roundCounts['Tuần 01'] / totalStaff) * 100) : 0 },
+        { name: 'Tuần 02', count: roundCounts['Tuần 02'], percentage: totalStaff ? Math.round((roundCounts['Tuần 02'] / totalStaff) * 100) : 0 },
+        { name: 'Tuần 03', count: roundCounts['Tuần 03'], percentage: totalStaff ? Math.round((roundCounts['Tuần 03'] / totalStaff) * 100) : 0 },
+        { name: 'Tuần 04', count: roundCounts['Tuần 04'], percentage: totalStaff ? Math.round((roundCounts['Tuần 04'] / totalStaff) * 100) : 0 },
+      ];
 
-        const rounds = [
-          { name: 'Tuần 01', count: roundCounts['Tuần 01'], percentage: totalStaff ? Math.round((roundCounts['Tuần 01'] / totalStaff) * 100) : 0 },
-          { name: 'Tuần 02', count: roundCounts['Tuần 02'], percentage: totalStaff ? Math.round((roundCounts['Tuần 02'] / totalStaff) * 100) : 0 },
-          { name: 'Tuần 03', count: roundCounts['Tuần 03'], percentage: totalStaff ? Math.round((roundCounts['Tuần 03'] / totalStaff) * 100) : 0 },
-          { name: 'Tuần 04', count: roundCounts['Tuần 04'], percentage: totalStaff ? Math.round((roundCounts['Tuần 04'] / totalStaff) * 100) : 0 },
-        ];
-
-        setStats({ totalStaff, totalSubmissions, unsubmittedCount: unsubmittedStaff.length, unsubmittedByDept, rounds });
-      } catch (err) {
-        console.error("Lỗi lấy thống kê:", err);
-      } finally {
-        setLoading(false);
-      }
+      setStats({ totalStaff, totalSubmissions, unsubmittedCount: unsubmittedStaff.length, unsubmittedByDept, rounds });
     };
 
-    fetchData();
-  }, []);
+    calculateStats();
+  }, [staffData, historyData]);
 
   if (loading) {
     return (
@@ -91,7 +79,7 @@ export default function Overview() {
           <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
             <Users size={80} />
           </div>
-          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">TỔNG NHÂN SỰ</p>
+          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">TỔNG ĐOÀN VIÊN</p>
           <h3 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight relative z-10">{stats.totalStaff}</h3>
         </motion.div>
 
@@ -143,7 +131,7 @@ export default function Overview() {
                <Award size={20} />
             </div>
             <div>
-               <h2 className="font-black text-slate-800 uppercase text-sm sm:text-base tracking-[0.1em] font-display">Chi tiết tuần</h2>
+               <h2 className="font-black text-slate-800 uppercase text-lg sm:text-xl tracking-[0.1em] font-display">Chi tiết tuần</h2>
             </div>
           </div>
           
@@ -157,10 +145,10 @@ export default function Overview() {
                 className="p-4 rounded-[24px] bg-slate-50 border border-slate-100 group hover:shadow-lg hover:shadow-slate-200/50 transition-all hover:-translate-y-1"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">{round.name}</span>
-                  <span className="text-base font-black text-slate-800 tracking-tight">{round.percentage}%</span>
+                  <span className="text-xs md:text-sm font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">{round.name}</span>
+                  <span className="text-lg md:text-xl font-black text-slate-800 tracking-tight">{round.percentage}%</span>
                 </div>
-                <div className="w-full h-2.5 bg-slate-200/60 rounded-full overflow-hidden shadow-inner flex mb-3">
+                <div className="w-full h-3 md:h-4 bg-slate-200/60 rounded-full overflow-hidden shadow-inner flex mb-3">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${round.percentage}%` }}
@@ -169,10 +157,10 @@ export default function Overview() {
                   />
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-[10px] text-slate-500 font-bold bg-white px-2.5 py-1 rounded-full shadow-sm border border-slate-100">{round.count} lượt nộp</span>
+                  <span className="text-xs md:text-sm text-slate-500 font-bold bg-white px-3 py-1.5 rounded-full shadow-sm border border-slate-100">{round.count} lượt nộp</span>
                   {round.percentage >= 80 && (
-                    <span className="text-[9px] text-emerald-600 font-black uppercase flex items-center gap-1.5 bg-emerald-50 px-2 py-1 rounded-full">
-                      <CheckCircle2 size={12} className="text-emerald-500" /> Đạt chỉ tiêu
+                    <span className="text-xs md:text-sm text-emerald-600 font-black uppercase flex items-center gap-1.5 bg-emerald-50 px-3 py-1.5 rounded-full">
+                      <CheckCircle2 size={14} className="text-emerald-500" /> Đạt chỉ tiêu
                     </span>
                   )}
                 </div>

@@ -1,12 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { LayoutGrid, ClipboardCheck, BarChart2 } from 'lucide-react';
 import FormView from './components/FormView';
 import HistoryView from './components/HistoryView';
 import Overview from './components/Overview';
+import { apiService } from './services/api';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'overview' | 'main'>('overview');
+  const [staffData, setStaffData] = useState<any[]>([]);
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch data only once on mount (F5)
+  useEffect(() => {
+    const loadSharedData = async () => {
+      try {
+        const [staff, history] = await Promise.all([
+          apiService.getStaff(),
+          apiService.getHistory()
+        ]);
+        setStaffData(staff);
+        setHistoryData(history);
+      } catch (error) {
+        console.error("Lỗi tải dữ liệu ban đầu:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSharedData();
+  }, []);
+
+  // Function to refresh data after submission
+  const refreshData = async () => {
+    try {
+      const history = await apiService.getHistory();
+      setHistoryData(history);
+    } catch (error) {
+      console.error("Lỗi làm mới lịch sử:", error);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] relative flex flex-col font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900 z-0">
@@ -65,35 +99,44 @@ export default function App() {
         </motion.header>
 
         <main className="flex-grow pb-12">
-          <AnimatePresence mode="wait">
-            {activeTab === 'overview' ? (
-              <motion.div 
-                key="overview"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <Overview />
-              </motion.div>
-            ) : (
-              <motion.div 
-                key="main"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8"
-              >
-                <div className="lg:col-span-5 flex flex-col">
-                  <div className="lg:sticky lg:top-8">
-                    <FormView />
+          {loading ? (
+             <div className="bg-white border border-white rounded-[40px] p-12 shadow-2xl shadow-blue-900/5 flex items-center justify-center min-h-[400px]">
+               <div className="flex flex-col items-center gap-4">
+                 <div className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                 <p className="text-slate-400 font-black uppercase tracking-[0.2em] text-[10px]">Gói dữ liệu đang được đồng bộ...</p>
+               </div>
+             </div>
+          ) : (
+            <AnimatePresence mode="wait">
+              {activeTab === 'overview' ? (
+                <motion.div 
+                  key="overview"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                >
+                  <Overview staffData={staffData} historyData={historyData} />
+                </motion.div>
+              ) : (
+                <motion.div 
+                  key="main"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  className="grid grid-cols-1 lg:grid-cols-12 gap-8"
+                >
+                  <div className="lg:col-span-5 flex flex-col">
+                    <div className="lg:sticky lg:top-8">
+                      <FormView staffData={staffData} onSubmitted={refreshData} />
+                    </div>
                   </div>
-                </div>
-                <div className="lg:col-span-7 flex flex-col">
-                  <HistoryView />
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                  <div className="lg:col-span-7 flex flex-col">
+                    <HistoryView historyData={historyData} />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          )}
         </main>
       </div>
     </div>

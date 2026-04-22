@@ -3,20 +3,12 @@ import { X, ExternalLink, Search, Filter, History, Calendar, User, Info, Chevron
 import { motion, AnimatePresence } from 'motion/react';
 import { apiService } from '../services/api';
 
-export default function HistoryView() {
+export default function HistoryView({ historyData }: { historyData: any[] }) {
   const [filterMSNV, setFilterMSNV] = useState('');
   const [filterRound, setFilterRound] = useState('');
   const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string, department:string} | null>(null);
   
-  const [historyData, setHistoryData] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    apiService.getHistory().then(data => {
-      setHistoryData(data);
-      setLoading(false);
-    });
-  }, []);
+  const loading = false; // Data is managed by parent App.tsx
 
   const filtered = historyData.filter(item => {
     const matchMsnv = (item.msnv || '').toString().toLowerCase().includes(filterMSNV.toLowerCase()) || 
@@ -89,15 +81,15 @@ export default function HistoryView() {
             Không tìm thấy bản ghi phù hợp
           </motion.div>
         ) : (
-          <table className="w-full min-w-[550px] text-left border-separate border-spacing-y-3 font-sans">
+          <table className="w-full min-w-[500px] text-left border-separate border-spacing-y-3 font-sans">
             <thead className="sticky top-0 bg-white z-10">
-              <tr className="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
-                <th className="pb-4 pt-0 px-6">Số hiệu</th>
-                <th className="pb-4 pt-0 px-6 font-sans">Thông tin Nhân sự</th>
-                <th className="pb-4 pt-0 px-6 font-sans text-right">Tuần thi</th>
+              <tr className="text-[10px] md:text-xs text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
+                <th className="pb-4 pt-0 px-3 md:px-6">Số hiệu</th>
+                <th className="pb-4 pt-0 px-3 md:px-6 font-sans">Thông tin Nhân sự</th>
+                <th className="pb-4 pt-0 px-3 md:px-6 font-sans text-right">Tuần thi</th>
               </tr>
             </thead>
-            <tbody className="text-sm font-bold font-sans">
+            <tbody className="text-sm md:text-base font-bold font-sans">
               {filtered.map((item, idx) => (
                 <motion.tr 
                   key={idx} 
@@ -107,17 +99,17 @@ export default function HistoryView() {
                   onClick={() => setSelectedItem(item)}
                   className="bg-slate-50/50 hover:bg-blue-50/80 cursor-pointer transition-all group border border-transparent hover:border-blue-100 rounded-2xl overflow-hidden font-sans"
                 >
-                  <td className="py-5 px-6 font-mono text-blue-600 first:rounded-l-2xl">
-                     <span className="bg-white px-2 py-1 rounded-lg border border-slate-100 shadow-sm">{item.msnv}</span>
+                  <td className="py-5 px-3 md:px-6 font-mono text-blue-600 first:rounded-l-2xl">
+                     <span className="bg-white px-2 py-1 rounded-lg border border-slate-100 shadow-sm text-xs md:text-sm">{item.msnv}</span>
                   </td>
-                  <td className="py-5 px-6">
+                  <td className="py-5 px-3 md:px-6">
                      <div className="flex flex-col">
-                        <span className="text-slate-800 text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
-                        <span className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || 'Đang cập nhật...'}</span>
+                        <span className="text-slate-800 text-sm md:text-base group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
+                        <span className="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || 'Đang cập nhật...'}</span>
                      </div>
                   </td>
-                  <td className="py-5 px-6 last:rounded-r-2xl text-right">
-                    <span className="bg-blue-600 text-white px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-widest shadow-lg shadow-blue-500/20 font-sans">
+                  <td className="py-5 px-3 md:px-6 last:rounded-r-2xl text-right">
+                    <span className="bg-blue-600 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 font-sans">
                       {item.round}
                     </span>
                   </td>
