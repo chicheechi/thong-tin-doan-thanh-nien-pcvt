@@ -178,18 +178,22 @@ export default function HistoryView() {
               </div>
               
               <motion.a 
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                href={selectedItem.link || '#'} 
+                whileHover={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 1.02 } : {}}
+                whileTap={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 0.98 } : {}}
+                href={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl || '#'} 
                 target="_blank" 
                 rel="noreferrer" 
-                className="mt-8 border-2 border-dashed border-blue-200 hover:border-blue-600 rounded-[24px] p-8 bg-blue-50/50 flex flex-col items-center justify-center text-center group transition-all block cursor-pointer group"
+                className={`mt-8 border-2 border-dashed rounded-[24px] p-8 flex flex-col items-center justify-center text-center group transition-all block cursor-pointer group ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'border-blue-200 hover:border-blue-600 bg-blue-50/50' : 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'}`}
               >
-                 <div className="w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform">
+                 <div className={`w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-4 transition-transform ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-600 group-hover:scale-110' : 'text-slate-300'}`}>
                     <ExternalLink size={28} />
                  </div>
-                 <p className="text-xs text-blue-700 font-black uppercase tracking-[0.2em] font-sans">Xem Ảnh Minh Chứng</p>
-                 <p className="text-[9px] text-blue-400 mt-2 font-bold italic tracking-wide font-sans">Mở rộng trong cửa sổ Drive mới</p>
+                 <p className={`text-xs font-black uppercase tracking-[0.2em] font-sans ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-700' : 'text-slate-400'}`}>
+                   {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Xem Ảnh Minh Chứng' : 'Chưa có liên kết ảnh'}
+                 </p>
+                 <p className="text-[9px] text-blue-400 mt-2 font-bold italic tracking-wide font-sans">
+                   {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Mở rộng trong cửa sổ Drive mới' : 'Dữ liệu đang được đồng bộ...'}
+                 </p>
               </motion.a>
               
               <button 
