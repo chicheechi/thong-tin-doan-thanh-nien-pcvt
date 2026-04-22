@@ -85,16 +85,22 @@ function uploadResult(payload) {
       sheet.appendRow(['Timestamp', 'Phòng ban', 'Họ và tên', 'MSNV', 'Vòng thi', 'Link ảnh Drive']);
     }
 
+    // Đảm bảo msnv sạch (không có dấu nháy) để tạo tên thư mục/file trên Drive
+    let cleanMsnv = payload.msnv.toString();
+    if (cleanMsnv.startsWith("'")) {
+      cleanMsnv = cleanMsnv.substring(1);
+    }
+
     let fileUrl = '';
     if (payload.imageBase64) {
-      fileUrl = saveImage(payload.imageBase64, payload.msnv, payload.round, payload.department, payload.name);
+      fileUrl = saveImage(payload.imageBase64, cleanMsnv, payload.round, payload.department, payload.name);
     }
 
     sheet.appendRow([
       Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss"), // A
       payload.department, // B
       payload.name,       // C
-      "'" + payload.msnv, // D - Force string to keep leading zero
+      "'" + cleanMsnv,    // D - Force string to keep leading zero
       payload.round,      // E
       fileUrl             // F
     ]);
@@ -113,32 +119,22 @@ function saveImage(base64Data, msnv, round, department, name) {
 
   // 1. Thư mục gốc
   let rootFolders = DriveApp.getFoldersByName(IMAGE_FOLDER_NAME);
-  let rootFolder;
-  if (rootFolders.hasNext()) {
-    rootFolder = rootFolders.next();
-  } else {
-    rootFolder = DriveApp.createFolder(IMAGE_FOLDER_NAME);
-  }
+  let rootFolder = rootFolders.hasNext() ? rootFolders.next() : DriveApp.createFolder(IMAGE_FOLDER_NAME);
 
-  // 2. Thư mục Phòng ban
+  // 2. Thư mục Vòng thi (MỚI)
+  let roundName = round ? round : 'Chưa xác định';
+  let roundFolders = rootFolder.getFoldersByName(roundName);
+  let roundFolder = roundFolders.hasNext() ? roundFolders.next() : rootFolder.createFolder(roundName);
+
+  // 3. Thư mục Phòng ban (Chuyển vào trong Vòng thi)
   let deptName = department ? department : 'Khác';
-  let deptFolders = rootFolder.getFoldersByName(deptName);
-  let deptFolder;
-  if (deptFolders.hasNext()) {
-    deptFolder = deptFolders.next();
-  } else {
-    deptFolder = rootFolder.createFolder(deptName);
-  }
+  let deptFolders = roundFolder.getFoldersByName(deptName);
+  let deptFolder = deptFolders.hasNext() ? deptFolders.next() : roundFolder.createFolder(deptName);
 
-  // 3. Thư mục Cá nhân (MSNV - Họ Tên)
+  // 4. Thư mục Cá nhân (MSNV - Họ Tên)
   let empFolderName = msnv + ' - ' + name;
   let empFolders = deptFolder.getFoldersByName(empFolderName);
-  let empFolder;
-  if (empFolders.hasNext()) {
-    empFolder = empFolders.next();
-  } else {
-    empFolder = deptFolder.createFolder(empFolderName);
-  }
+  let empFolder = empFolders.hasNext() ? empFolders.next() : deptFolder.createFolder(empFolderName);
 
   const file = empFolder.createFile(blob);
   file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
