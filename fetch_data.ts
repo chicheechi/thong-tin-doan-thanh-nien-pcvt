@@ -25,9 +25,9 @@ async function fetchAndParse() {
   const nameIdx = headers.findIndex(h => h.includes('họvàtên') || h.includes('họ') && h.includes('tên'));
   const deptIdx = headers.findIndex(h => h.includes('phòngban') || h.includes('đơnvị') || h.includes('tênphòng'));
   
-  const actualMsnvIdx = msnvIdx !== -1 ? msnvIdx : 1;
+  const actualMsnvIdx = msnvIdx !== -1 ? msnvIdx : 3;
   const actualNameIdx = nameIdx !== -1 ? nameIdx : 2;
-  const actualDeptIdx = deptIdx !== -1 ? deptIdx : 5;
+  const actualDeptIdx = deptIdx !== -1 ? deptIdx : 1;
   
   const data = [];
   for (let i = headerIdx + 1; i < lines.length; i++) {
@@ -47,11 +47,25 @@ async function fetchAndParse() {
     }
     cols.push(current);
     
-    if (cols[actualMsnvIdx] && cols[actualNameIdx]) {
+    let msnvRaw = cols[actualMsnvIdx] ? cols[actualMsnvIdx].trim().replace(/^"|"$/g, '') : '';
+    let msnv = msnvRaw;
+    if (/^\d+$/.test(msnvRaw)) {
+        msnv = msnvRaw.padStart(6, '0');
+    }
+    
+    let nameRaw = cols[actualNameIdx].trim().replace(/^"|"$/g, '');
+    // Standardize Name to Title Case
+    nameRaw = nameRaw.toLowerCase().replace(/(?:^|\s)\S/g, a => a.toUpperCase());
+    
+    let deptRaw = cols[actualDeptIdx] ? cols[actualDeptIdx].trim().replace(/^"|"$/g, '') : 'Khác';
+    // Standardize Department name optionally
+    deptRaw = deptRaw.charAt(0).toUpperCase() + deptRaw.slice(1);
+
+    if (msnv && cols[actualNameIdx]) {
       data.push({
-        id: cols[actualMsnvIdx].trim().replace(/^"|"$/g, ''),
-        name: cols[actualNameIdx].trim().replace(/^"|"$/g, ''),
-        department: cols[actualDeptIdx] ? cols[actualDeptIdx].trim().replace(/^"|"$/g, '') : 'Khác'
+        id: msnv,
+        name: nameRaw,
+        department: deptRaw
       });
     }
   }

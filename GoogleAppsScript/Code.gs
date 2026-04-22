@@ -9,45 +9,48 @@ function doGet() {
 
 function getStaffData() {
   const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
-  const sheet = ss.getSheets()[0]; 
+  const sheet = ss.getSheets()[0]; // Lọc danh sách ở Sheet đầu tiên
   const data = sheet.getDataRange().getDisplayValues();
   const staffList = [];
 
   if (data.length <= 1) return [];
 
-  let headerRowIdx = -1;
-  // Tìm dòng tiêu đề chính xác hơn
-  for (let i = 0; i < Math.min(10, data.length); i++) {
+  let headerRowIdx = 0;
+  // Quét 5 dòng đầu tiên để tự động tìm dòng tiêu đề và làm sạch khoảng trắng/xuống dòng
+  for (let i = 0; i < Math.min(5, data.length); i++) {
     const rowStr = data[i].map(c => c.toString().toLowerCase().replace(/\s+/g, '')).join('');
-    if (rowStr.includes('họvàtên') || rowStr.includes('sốhiệu') || rowStr.includes('msnv')) {
+    if (rowStr.includes('phòngban') || rowStr.includes('họvàtên') || rowStr.includes('sốhiệu')) {
       headerRowIdx = i;
       break;
     }
   }
 
-  if (headerRowIdx === -1) headerRowIdx = 0;
-
+  // Tự động nhận diện cột linh hoạt (loại bỏ mọi dấu cách, enter rỗng để quét khớp 100%)
   const cleanHeaders = data[headerRowIdx].map(h => h.toString().toLowerCase().replace(/\s+/g, ''));
-  
-  // Ưu tiên tìm chính xác hơn để tránh trùng lặp nếu tiêu đề gộp
-  let msnvIdx = cleanHeaders.findIndex(h => h === 'msnv' || h === 'sốhiệu' || h.includes('mãnhânviên'));
-  let nameIdx = cleanHeaders.findIndex(h => h === 'họvàtên' || (h.includes('họ') && h.includes('tên')));
-  let deptIdx = cleanHeaders.findIndex(h => h.includes('phòngban') || h.includes('đơnvị') || h.includes('bộphận') || h === 'tênphòng');
+  let deptIdx = cleanHeaders.findIndex(h => h.includes('phòngban') || h.includes('tênphòng') || h.includes('đơnvị'));
+  let nameIdx = cleanHeaders.findIndex(h => h.includes('họ') && h.includes('tên'));
+  let msnvIdx = cleanHeaders.findIndex(h => h.includes('sốhiệu') || h.includes('msnv') || h.includes('mãnhânviên'));
 
-  // Fallback chuẩn hóa theo thứ tự phổ biến: B:MSNV (1), C:Họ Tên (2), D:Phòng Ban (3)
-  if (msnvIdx === -1) msnvIdx = 1; 
-  if (nameIdx === -1) nameIdx = 2; 
-  if (deptIdx === -1) deptIdx = 3; 
+  // Fallback lại cột mặc định theo bảng nếu bị sai tiêu đề
+  if (deptIdx === -1) deptIdx = 1; // Cột B mặc định (Phòng Ban)
+  if (nameIdx === -1) nameIdx = 2; // Cột C mặc định (Họ và Tên)
+  if (msnvIdx === -1) msnvIdx = 3; // Cột D mặc định (Số hiệu)
 
-  // Duyệt dữ liệu, bỏ qua dòng tiêu đề và các dòng trống
+  // Duyệt dữ liệu từ dòng kế tiếp của headers
   for (let i = headerRowIdx + 1; i < data.length; i++) {
-    const row = data[i];
-    const msnv = row[msnvIdx] ? row[msnvIdx].toString().trim() : ''; 
-    const name = row[nameIdx] ? row[nameIdx].toString().trim() : '';
-    const department = row[deptIdx] ? row[deptIdx].toString().trim() : 'Khác';
+    let msnvRaw = data[i][msnvIdx] ? data[i][msnvIdx].toString().trim() : ''; 
+    let msnv = msnvRaw;
+    if (/^\d+$/.test(msnvRaw)) {
+        msnv = msnvRaw.padStart(6, '0');
+    }
+    
+    let nameRaw = data[i][nameIdx] ? data[i][nameIdx].toString().trim() : '';
+    let name = nameRaw.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+    
+    let deptRaw = data[i][deptIdx] ? data[i][deptIdx].toString().trim() : 'Khác';
+    let department = deptRaw.charAt(0).toUpperCase() + deptRaw.slice(1);
 
-    // Đảm bảo không lấy nhầm dòng tiêu đề hoặc dòng trống
-    if (msnv && name && name.toLowerCase().replace(/\s+/g, '') !== 'họvàtên') {
+    if (msnv && name) {
       staffList.push({ id: msnv, name: name, department: department });
     }
   }
@@ -59,10 +62,10 @@ function uploadResult(payload) {
     const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
     let sheet = ss.getSheetByName('KetQua');
     
+    // Nếu chưa có sheet KetQua thì tự tạo và thêm dòng tiêu đề
     if (!sheet) {
       sheet = ss.insertSheet('KetQua');
-      sheet.appendRow(['Timestamp', 'MSNV', 'Họ và tên', 'Phòng ban', 'Vòng thi', 'Ngày thi', 'Link ảnh Drive']);
-      sheet.getRange(1, 1, 1, 7).setFontWeight('bold').setBackground('#f3f3f3');
+      sheet.appendRow(['Timestamp', 'MSNV', 'Họ và tên', 'Vòng thi', 'Ngày thi', 'Link ảnh Drive']);
     }
 
     let fileUrl = '';
@@ -74,9 +77,8 @@ function uploadResult(payload) {
       Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss"),
       payload.msnv,
       payload.name,
-      payload.department || 'Dữ liệu cũ',
       payload.round,
-      payload.date || Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy"),
+      payload.date,
       fileUrl
     ]);
 
@@ -136,18 +138,13 @@ function getHistory() {
 
   // Bắt đầu từ 1 để bỏ qua dòng tiêu đề
   for (let i = 1; i < data.length; i++) {
-    const row = data[i];
-    // Đảm bảo lấy đúng cột theo thứ tự mới: Timestamp(0), MSNV(1), Họ và tên(2), Phòng ban(3), Vòng thi(4), Ngày thi(5), Link(6)
     history.push({
-      timestamp: row[0],
-      msnv: row[1],
-      name: row[2],
-      // Nếu dòng cũ chỉ có 6 cột, thì các cột sau sẽ bị lệch. 
-      // Kiểm tra sơ bộ: Nếu cột 6 trống nhưng cột 5 có ký tự thì có thể là mẫu cũ
-      department: row.length > 6 ? (row[3] || '') : 'Dữ liệu cũ',
-      round: row.length > 6 ? row[4] : row[3],
-      date: row.length > 6 ? row[5] : row[4],
-      link: row.length > 6 ? row[6] : row[5]
+      timestamp: data[i][0],
+      msnv: data[i][1],
+      name: data[i][2],
+      round: data[i][3],
+      date: data[i][4],
+      link: data[i][5]
     });
   }
   // Đảo ngược danh sách để hiển thị lượt nộp mới nhất lên đầu

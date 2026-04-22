@@ -19,10 +19,8 @@ export default function HistoryView() {
   }, []);
 
   const filtered = historyData.filter(item => {
-    const searchLow = filterMSNV.toLowerCase();
-    const matchMsnv = (item.msnv || '').toString().toLowerCase().includes(searchLow) || 
-                      (item.name || '').toString().toLowerCase().includes(searchLow) ||
-                      (item.department || '').toString().toLowerCase().includes(searchLow);
+    const matchMsnv = (item.msnv || '').toString().toLowerCase().includes(filterMSNV.toLowerCase()) || 
+                      (item.name || '').toString().toLowerCase().includes(filterMSNV.toLowerCase());
     const matchRound = filterRound === '' || item.round === filterRound;
     return matchMsnv && matchRound;
   });
@@ -115,7 +113,7 @@ export default function HistoryView() {
                   <td className="py-5 px-6">
                      <div className="flex flex-col">
                         <span className="text-slate-800 text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
-                        <span className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || 'Xác nhận hoàn thành'}</span>
+                        <span className="text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">Xác nhận hoàn thành</span>
                      </div>
                   </td>
                   <td className="py-5 px-6 last:rounded-r-2xl text-right">
@@ -166,9 +164,6 @@ export default function HistoryView() {
                    <div className="flex flex-col">
                       <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Nhân sự</span>
                       <span className="font-bold text-slate-800 text-sm font-sans">{selectedItem.name} ({selectedItem.msnv})</span>
-                      {selectedItem.department && (
-                        <span className="text-[10px] text-blue-600 font-bold mt-1 font-sans">{selectedItem.department}</span>
-                      )}
                    </div>
                 </div>
 
@@ -184,21 +179,21 @@ export default function HistoryView() {
               </div>
               
               <motion.a 
-                whileHover={selectedItem.link ? { scale: 1.02 } : {}}
-                whileTap={selectedItem.link ? { scale: 0.98 } : {}}
-                href={selectedItem.link || '#'} 
+                whileHover={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 1.02 } : {}}
+                whileTap={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 0.98 } : {}}
+                href={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl || '#'} 
                 target="_blank" 
                 rel="noreferrer" 
-                className={`mt-8 border-2 border-dashed rounded-[24px] p-8 flex flex-col items-center justify-center text-center group transition-all block cursor-pointer group ${selectedItem.link ? 'border-blue-200 hover:border-blue-600 bg-blue-50/50' : 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'}`}
+                className={`mt-8 border-2 border-dashed rounded-[24px] p-8 flex flex-col items-center justify-center text-center group transition-all block cursor-pointer group ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'border-blue-200 hover:border-blue-600 bg-blue-50/50' : 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'}`}
               >
-                 <div className={`w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-4 transition-transform ${selectedItem.link ? 'text-blue-600 group-hover:scale-110' : 'text-slate-300'}`}>
+                 <div className={`w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-4 transition-transform ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-600 group-hover:scale-110' : 'text-slate-300'}`}>
                     <ExternalLink size={28} />
                  </div>
-                 <p className={`text-xs font-black uppercase tracking-[0.2em] font-sans ${selectedItem.link ? 'text-blue-700' : 'text-slate-400'}`}>
-                   {selectedItem.link ? 'Xem Ảnh Minh Chứng' : 'Chưa có liên kết ảnh'}
+                 <p className={`text-xs font-black uppercase tracking-[0.2em] font-sans ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-700' : 'text-slate-400'}`}>
+                   {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Xem Ảnh Minh Chứng' : 'Chưa có liên kết ảnh'}
                  </p>
                  <p className="text-[9px] text-blue-400 mt-2 font-bold italic tracking-wide font-sans">
-                   {selectedItem.link ? 'Mở rộng trong cửa sổ Drive mới' : 'Dữ liệu đang được đồng bộ...'}
+                   {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Mở rộng trong cửa sổ Drive mới' : 'Dữ liệu đang được đồng bộ...'}
                  </p>
               </motion.a>
               
