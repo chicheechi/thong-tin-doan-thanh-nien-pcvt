@@ -94,7 +94,7 @@ function uploadResult(payload) {
       Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss"), // A
       payload.department, // B
       payload.name,       // C
-      payload.msnv,       // D
+      "'" + payload.msnv, // D - Force string to keep leading zero
       payload.round,      // E
       fileUrl             // F
     ]);
@@ -155,11 +155,17 @@ function getHistory() {
 
   // Bắt đầu từ 1 để bỏ qua dòng tiêu đề
   for (let i = 1; i < data.length; i++) {
+    let msnvRaw = data[i][3] ? data[i][3].toString().trim() : '';
+    let msnv = msnvRaw;
+    if (/^\d+$/.test(msnvRaw)) {
+        msnv = msnvRaw.padStart(6, '0');
+    }
+    
     history.push({
       timestamp: data[i][0], // A
       department: data[i][1], // B
       name: data[i][2], // C
-      msnv: data[i][3], // D
+      msnv: msnv, // D
       round: data[i][4], // E
       link: data[i][5] // F
     });

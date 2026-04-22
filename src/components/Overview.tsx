@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, CheckCircle2, TrendingUp, Award, UserMinus, AlertCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { Users, CheckCircle2, TrendingUp, Award, UserMinus, AlertCircle, X, Search } from 'lucide-react';
 import { apiService } from '../services/api';
 
 export default function Overview() {
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [searchUnsubmitted, setSearchUnsubmitted] = useState('');
   const [stats, setStats] = useState({
     totalStaff: 0,
     totalSubmissions: 0,
@@ -105,8 +107,10 @@ export default function Overview() {
         </motion.div>
 
         <motion.div 
-          whileHover={{ y: -4 }}
-          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group"
+          whileHover={{ y: -4, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => setShowModal(true)}
+          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group cursor-pointer"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 text-white group-hover:scale-110 transition-transform">
             <UserMinus size={80} />
@@ -114,6 +118,7 @@ export default function Overview() {
           <p className="text-[9px] sm:text-[10px] font-black text-rose-100 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">CHƯA NỘP BÀI</p>
           <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight relative z-10 flex items-center gap-2">
             {stats.unsubmittedCount} 
+            <span className="text-[8px] bg-white/20 px-2 py-0.5 rounded-full font-bold animate-pulse">XEM DANH SÁCH</span>
           </h3>
         </motion.div>
 
@@ -124,7 +129,7 @@ export default function Overview() {
           <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
             <TrendingUp size={80} />
           </div>
-          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">TRUNG BÌNH</p>
+          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">TỈ LỆ</p>
           <h3 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight relative z-10">{Math.round(stats.rounds.reduce((a, b) => a + b.percentage, 0) / 4)}%</h3>
         </motion.div>
       </div>
@@ -176,6 +181,92 @@ export default function Overview() {
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+               onClick={() => setShowModal(false)}
+             />
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95, y: 20 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.95, y: 20 }}
+               className="bg-white rounded-[40px] w-full max-w-4xl max-h-[80vh] overflow-hidden flex flex-col relative z-10 shadow-2xl shadow-rose-900/20"
+             >
+                <div className="p-8 pb-4 flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                      <div className="p-3 bg-rose-50 rounded-2xl text-rose-500">
+                        <UserMinus size={24} />
+                      </div>
+                      <div>
+                        <h2 className="text-xl font-black text-slate-800 uppercase tracking-tight">Nhân sự chưa nộp bài</h2>
+                        <p className="text-[10px] text-rose-500 font-black uppercase tracking-widest mt-1">{stats.unsubmittedCount} người cần hoàn thành</p>
+                      </div>
+                   </div>
+                   <button 
+                    onClick={() => setShowModal(false)}
+                    className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-all text-slate-500"
+                   >
+                     <X size={20} />
+                   </button>
+                </div>
+
+                <div className="px-8 mb-6">
+                   <div className="relative group">
+                     <Search size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                     <input 
+                       type="text"
+                       placeholder="Tìm kiếm theo tên hoặc mã số..."
+                       value={searchUnsubmitted}
+                       onChange={(e) => setSearchUnsubmitted(e.target.value)}
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-sm font-bold focus:border-rose-300 focus:bg-white focus:ring-4 focus:ring-rose-500/5 transition-all outline-none"
+                     />
+                   </div>
+                </div>
+
+                <div className="flex-grow overflow-auto px-8 pb-10 custom-scrollbar">
+                   <div className="space-y-8">
+                      {Object.entries(stats.unsubmittedByDept).map(([dept, list]) => {
+                        const filtered = list.filter(s => 
+                          s.name.toLowerCase().includes(searchUnsubmitted.toLowerCase()) || 
+                          s.id.includes(searchUnsubmitted)
+                        );
+                        if (filtered.length === 0) return null;
+
+                        return (
+                          <div key={dept}>
+                             <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white py-2 z-10">
+                               <div className="w-2 h-2 rounded-full bg-rose-400"></div>
+                               <h3 className="font-black text-slate-700 text-sm uppercase tracking-widest">{dept}</h3>
+                               <span className="text-[10px] bg-rose-50 text-rose-500 px-2.5 py-0.5 rounded-full font-black">{filtered.length} người</span>
+                             </div>
+                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {filtered.map(s => (
+                                  <div key={s.id} className="bg-slate-50/50 border border-slate-100 p-4 rounded-2xl flex items-center justify-between group hover:bg-rose-50 hover:border-rose-100 transition-all">
+                                     <div>
+                                        <p className="font-bold text-slate-800 text-sm">{s.name}</p>
+                                        <p className="font-mono text-[10px] text-slate-400 mt-1 font-bold">{s.id}</p>
+                                     </div>
+                                     <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-rose-300 group-hover:text-rose-500 shadow-sm">
+                                        <AlertCircle size={14} />
+                                     </div>
+                                  </div>
+                                ))}
+                             </div>
+                          </div>
+                        );
+                      })}
+                   </div>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
