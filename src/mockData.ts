@@ -298,7 +298,8 @@ export const mockHistory: any[] = [
     "name": "Nguyễn Huy",
     "msnv": "010333",
     "round": "Tuần 01",
-    "link": "https://drive.google.com/file/d/1zWa1ObO9oN_-dwOE3zn5zLh1xfytk5_A/view?usp=drivesdk"
+    "link": "https://drive.google.com/file/d/1zWa1ObO9oN_-dwOE3zn5zLh1xfytk5_A/view?usp=drivesdk",
+    "status": "Đã có chứng nhận"
   },
   {
     "timestamp": "22/04/2026 10:57:07",
@@ -306,6 +307,7 @@ export const mockHistory: any[] = [
     "name": "Hoàng Mỹ Duyên",
     "msnv": "012746",
     "round": "Tuần 01",
-    "link": "https://drive.google.com/file/d/1FE0p8kffHpuVj_yqPyOn2h4IbwzCtjYE/view?usp=drivesdk"
+    "link": "https://drive.google.com/file/d/1FE0p8kffHpuVj_yqPyOn2h4IbwzCtjYE/view?usp=drivesdk",
+    "status": "Chưa có chứng nhận"
   }
 ];

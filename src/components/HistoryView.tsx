@@ -6,7 +6,7 @@ import { apiService } from '../services/api';
 export default function HistoryView({ historyData }: { historyData: any[] }) {
   const [filterMSNV, setFilterMSNV] = useState('');
   const [filterRound, setFilterRound] = useState('');
-  const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string, department:string} | null>(null);
+  const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
   
@@ -93,6 +93,7 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
               <tr className="text-[9px] md:text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
                 <th className="pb-3 pt-0 px-3 md:px-4">Số hiệu</th>
                 <th className="pb-3 pt-0 px-3 md:px-4 font-sans">Nhân sự</th>
+                <th className="pb-3 pt-0 px-3 md:px-4 font-sans text-center">Trạng Thái</th>
                 <th className="pb-3 pt-0 px-3 md:px-4 font-sans text-right">Tuần</th>
               </tr>
             </thead>
@@ -114,6 +115,15 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                         <span className="text-slate-800 text-xs md:text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
                         <span className="text-[8px] md:text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || '...'}</span>
                      </div>
+                  </td>
+                  <td className="py-3 px-3 md:px-4 text-center">
+                     {item.status ? (
+                        <span className={`px-2 py-1 rounded-md text-[9px] font-black uppercase tracking-widest ${item.status === 'Đã có chứng nhận' ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                           {item.status}
+                        </span>
+                     ) : (
+                        <span className="text-[9px] text-slate-300 italic">Chưa phân loại</span>
+                     )}
                   </td>
                   <td className="py-3 px-3 md:px-4 last:rounded-r-xl text-right">
                     <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[8px] md:text-[9px] uppercase tracking-widest shadow-md shadow-blue-500/10 font-sans">
@@ -223,6 +233,18 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                       <span className="font-bold text-slate-800 text-sm whitespace-nowrap font-sans">{selectedItem.round}</span>
                    </div>
                 </div>
+
+                {selectedItem.status && (
+                  <div className={`flex items-center gap-4 p-4 rounded-2xl border ${selectedItem.status === 'Đã có chứng nhận' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
+                     <div className={`w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-600' : 'text-red-500'}`}>
+                        <Info size={20} />
+                     </div>
+                     <div className="flex flex-col">
+                        <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-1.5 font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700/60' : 'text-red-700/60'}`}>Trạng Thái AI</span>
+                        <span className={`font-bold text-sm font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700' : 'text-red-700'}`}>{selectedItem.status}</span>
+                     </div>
+                  </div>
+                )}
               </div>
               
               <motion.a 
