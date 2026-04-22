@@ -70,7 +70,38 @@ async function fetchAndParse() {
     }
   }
   
-  const outputContent = `export const mockStaff = ${JSON.stringify(data, null, 2)};\n\nexport const mockHistory: any[] = [];\n`;
+  // Fetch History API
+  const historyRes = await fetch('https://docs.google.com/spreadsheets/d/1Qui6AL8gnfS9WWFDGr2LFpOvpUwBCsr4e8j0Z-xiETc/export?format=csv&gid=1727689083');
+  const historyText = await historyRes.text();
+  const historyLines = historyText.split('\n').map(l => l.trim());
+  const historyData = [];
+
+  for (let i = 1; i < historyLines.length; i++) {
+    if (!historyLines[i]) continue;
+    let cols = [];
+    let inString = false;
+    let current = '';
+    for(let char of historyLines[i]) {
+      if(char === '"') inString = !inString;
+      else if(char === ',' && !inString) { cols.push(current); current = ''; }
+      else { current += char; }
+    }
+    cols.push(current);
+    
+    if (cols.length >= 5 && cols[0]) {
+       // B (cols[1]) is Dept, C (cols[2]) is Name, D (cols[3]) is MSNV, E (cols[4]) is Round, F (cols[5]) is Link
+       historyData.push({
+          timestamp: cols[0].replace(/^"|"$/g, ''),
+          department: cols[1] ? cols[1].replace(/^"|"$/g, '') : '',
+          name: cols[2] ? cols[2].replace(/^"|"$/g, '') : '',
+          msnv: cols[3] ? cols[3].replace(/^"|"$/g, '').padStart(6, '0') : '',
+          round: cols[4] ? cols[4].replace(/^"|"$/g, '') : '',
+          link: cols[5] ? cols[5].replace(/^"|"$/g, '') : ''
+       });
+    }
+  }
+
+  const outputContent = `export const mockStaff = ${JSON.stringify(data, null, 2)};\n\nexport const mockHistory: any[] = ${JSON.stringify(historyData, null, 2)};\n`;
   fs.writeFileSync('src/mockData.ts', outputContent);
   console.log('Successfully updated mockData.ts with ' + data.length + ' records.');
 }

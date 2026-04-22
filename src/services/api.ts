@@ -1,25 +1,17 @@
 import { GAS_WEB_APP_URL } from '../config';
-import { mockStaff } from '../mockData';
+import { mockStaff, mockHistory } from '../mockData';
 
 export const apiService = {
   getStaff: async () => {
     try {
-      // Ép thời gian chờ 3 giây cho Google, quá 3 giây dùng ngay dự phòng cho nhanh
-      const controller = new AbortController();
-      const id = setTimeout(() => controller.abort(), 3000);
-      
-      const response = await fetch(`${GAS_WEB_APP_URL}?action=getStaff`, { 
-        signal: controller.signal,
-        cache: 'no-cache'
-      });
-      clearTimeout(id);
-      
+      const response = await fetch(`${GAS_WEB_APP_URL}?action=getStaff`, { cache: 'no-cache' });
       if (response.ok) {
         const data = await response.json();
         return (data && data.length > 0) ? data : mockStaff;
       }
       return mockStaff;
     } catch (error) {
+      console.warn("GAS CORS or Network error. Have you deployed doGet for JSON? Falling back to mockData.");
       return mockStaff;
     }
   },
@@ -27,10 +19,14 @@ export const apiService = {
   getHistory: async () => {
     try {
       const response = await fetch(`${GAS_WEB_APP_URL}?action=getHistory`, { cache: 'no-cache' });
-      if (response.ok) return await response.json();
+      if (response.ok) {
+        const data = await response.json();
+        return data || [];
+      }
       return [];
     } catch (error) {
-      return [];
+      console.warn("GAS CORS or Network error. Retrying History fetch using cross-origin request...");
+      return mockHistory || [];
     }
   },
 

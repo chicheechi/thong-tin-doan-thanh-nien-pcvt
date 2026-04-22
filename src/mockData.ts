@@ -291,4 +291,21 @@ export const mockStaff = [
   }
 ];
 
-export const mockHistory: any[] = [];
+export const mockHistory: any[] = [
+  {
+    "timestamp": "22/04/2026 10:02:42",
+    "department": "Phòng Kỹ Thuật và An toàn",
+    "name": "Nguyễn Huy",
+    "msnv": "010333",
+    "round": "Tuần 01",
+    "link": "https://drive.google.com/file/d/1zWa1ObO9oN_-dwOE3zn5zLh1xfytk5_A/view?usp=drivesdk"
+  },
+  {
+    "timestamp": "22/04/2026 10:57:07",
+    "department": "Phòng Kinh doanh",
+    "name": "Hoàng Mỹ Duyên",
+    "msnv": "012746",
+    "round": "Tuần 01",
+    "link": "https://drive.google.com/file/d/1FE0p8kffHpuVj_yqPyOn2h4IbwzCtjYE/view?usp=drivesdk"
+  }
+];

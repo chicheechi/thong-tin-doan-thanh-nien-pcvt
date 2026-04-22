@@ -1,10 +1,27 @@
 const SPREADSHEET_ID = '1Qui6AL8gnfS9WWFDGr2LFpOvpUwBCsr4e8j0Z-xiETc';
 const IMAGE_FOLDER_NAME = 'KetQuaThi_Images';
 
-function doGet() {
+function doGet(e) {
+  if (e && e.parameter && e.parameter.action === 'getStaff') {
+    return ContentService.createTextOutput(JSON.stringify(getStaffData())).setMimeType(ContentService.MimeType.JSON);
+  } else if (e && e.parameter && e.parameter.action === 'getHistory') {
+    return ContentService.createTextOutput(JSON.stringify(getHistory())).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  // Nếu không gọi API qua ?action=... thì mở giao diện HTML
   return HtmlService.createHtmlOutputFromFile('Index')
     .setTitle('Thu Thập Kết Quả Thi PCVT')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+}
+
+function doPost(e) {
+  try {
+    const payload = JSON.parse(e.postData.contents);
+    const result = uploadResult(payload);
+    return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({ success: false, message: error.toString() })).setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
 function getStaffData() {
@@ -65,7 +82,7 @@ function uploadResult(payload) {
     // Nếu chưa có sheet KetQua thì tự tạo và thêm dòng tiêu đề
     if (!sheet) {
       sheet = ss.insertSheet('KetQua');
-      sheet.appendRow(['Timestamp', 'MSNV', 'Họ và tên', 'Vòng thi', 'Ngày thi', 'Link ảnh Drive']);
+      sheet.appendRow(['Timestamp', 'Phòng ban', 'Họ và tên', 'MSNV', 'Vòng thi', 'Link ảnh Drive']);
     }
 
     let fileUrl = '';
@@ -74,12 +91,12 @@ function uploadResult(payload) {
     }
 
     sheet.appendRow([
-      Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss"),
-      payload.msnv,
-      payload.name,
-      payload.round,
-      payload.date,
-      fileUrl
+      Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd/MM/yyyy HH:mm:ss"), // A
+      payload.department, // B
+      payload.name,       // C
+      payload.msnv,       // D
+      payload.round,      // E
+      fileUrl             // F
     ]);
 
     return { success: true, message: 'Nộp kết quả thành công!' };
@@ -139,12 +156,12 @@ function getHistory() {
   // Bắt đầu từ 1 để bỏ qua dòng tiêu đề
   for (let i = 1; i < data.length; i++) {
     history.push({
-      timestamp: data[i][0],
-      msnv: data[i][1],
-      name: data[i][2],
-      round: data[i][3],
-      date: data[i][4],
-      link: data[i][5]
+      timestamp: data[i][0], // A
+      department: data[i][1], // B
+      name: data[i][2], // C
+      msnv: data[i][3], // D
+      round: data[i][4], // E
+      link: data[i][5] // F
     });
   }
   // Đảo ngược danh sách để hiển thị lượt nộp mới nhất lên đầu
