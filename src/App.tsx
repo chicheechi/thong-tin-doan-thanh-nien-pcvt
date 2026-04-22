@@ -6,7 +6,7 @@ import HistoryView from './components/HistoryView';
 import Overview from './components/Overview';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<'main' | 'overview'>('main');
+  const [activeTab, setActiveTab] = useState<'overview' | 'main'>('overview');
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col font-sans text-slate-900 selection:bg-blue-100 selection:text-blue-900">
@@ -22,7 +22,7 @@ export default function App() {
           <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 transition-all mb-8 w-full justify-center">
             <motion.div 
               whileHover={{ scale: 1.05 }}
-              className="bg-white p-2 rounded-2xl border border-slate-100 flex items-center justify-center overflow-hidden w-16 h-16 sm:w-20 sm:h-20 shrink-0 shadow-lg shadow-slate-200"
+              className="bg-white p-2 rounded-2xl border border-slate-100 flex items-center justify-center overflow-hidden w-16 h-16 sm:w-20 sm:h-20 shrink-0 shadow-lg shadow-slate-200 shadow-inner"
             >
               <img 
                 src="https://lh3.googleusercontent.com/d/1saQ-Dwts6HvnqPMjM6xvQF7CWxGtddlN" 
@@ -31,23 +31,18 @@ export default function App() {
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <div className="text-center sm:text-left">
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight leading-tight uppercase font-display italic">Thu Thập Kết Quả Thi</h1>
-              <div className="flex items-center gap-2 mt-1 justify-center sm:justify-start">
+            <div className="text-center sm:text-left max-w-2xl">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900 tracking-tight leading-tight uppercase font-display italic">
+                Thu thập kết quả thi Tìm hiểu về cuộc đời và sự nghiệp của Tổng Bí thư Hà Huy Tập
+              </h1>
+              <div className="flex items-center gap-2 mt-2 justify-center sm:justify-start">
                 <span className="w-8 h-[2px] bg-blue-600 rounded-full"></span>
-                <p className="text-[10px] sm:text-xs text-blue-600 font-black uppercase tracking-[0.3em]">Đoàn Thanh niên PCVT</p>
+                <p className="text-[10px] sm:text-xs text-blue-600 font-black uppercase tracking-[0.3em]">Đoàn Thanh Niên PC Vũng Tàu</p>
               </div>
             </div>
           </div>
 
           <div className="flex bg-slate-100/50 p-1.5 rounded-full border border-slate-200/60 backdrop-blur-sm self-center">
-            <button 
-              onClick={() => setActiveTab('main')}
-              className={`flex items-center gap-2 px-6 sm:px-10 py-3 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-500 ${activeTab === 'main' ? 'bg-blue-600 text-white shadow-xl shadow-blue-300 scale-[1.02]' : 'text-slate-400 hover:text-slate-700'}`}
-            >
-              <ClipboardCheck size={16} />
-              Nộp bài & Lịch sử
-            </button>
             <button 
               onClick={() => setActiveTab('overview')}
               className={`flex items-center gap-2 px-6 sm:px-10 py-3 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-500 ${activeTab === 'overview' ? 'bg-blue-600 text-white shadow-xl shadow-blue-300 scale-[1.02]' : 'text-slate-400 hover:text-slate-700'}`}
@@ -55,12 +50,28 @@ export default function App() {
               <BarChart2 size={16} />
               Tổng quan thống kê
             </button>
+            <button 
+              onClick={() => setActiveTab('main')}
+              className={`flex items-center gap-2 px-6 sm:px-10 py-3 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-500 ${activeTab === 'main' ? 'bg-blue-600 text-white shadow-xl shadow-blue-300 scale-[1.02]' : 'text-slate-400 hover:text-slate-700'}`}
+            >
+              <ClipboardCheck size={16} />
+              Nộp bài & Lịch sử
+            </button>
           </div>
         </motion.header>
 
         <main className="flex-grow pb-12">
           <AnimatePresence mode="wait">
-            {activeTab === 'main' ? (
+            {activeTab === 'overview' ? (
+              <motion.div 
+                key="overview"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+              >
+                <Overview />
+              </motion.div>
+            ) : (
               <motion.div 
                 key="main"
                 initial={{ opacity: 0, y: 10 }}
@@ -76,15 +87,6 @@ export default function App() {
                 <div className="lg:col-span-7 flex flex-col">
                   <HistoryView />
                 </div>
-              </motion.div>
-            ) : (
-              <motion.div 
-                key="overview"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-              >
-                <Overview />
               </motion.div>
             )}
           </AnimatePresence>
