@@ -41,10 +41,7 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
            </div>
            <div>
               <h2 className="font-black text-slate-800 uppercase text-base tracking-[0.1em] font-display">Lịch Sử Hoàn Thành</h2>
-              <p className="text-[10px] text-slate-400 mt-0.5 uppercase font-black tracking-widest flex items-center gap-1.5 font-sans">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Dữ liệu trực tuyến
-              </p>
+
            </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 items-stretch md:items-center w-full sm:w-auto h-full sm:ml-auto">
