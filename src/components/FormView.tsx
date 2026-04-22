@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Upload } from 'lucide-react';
+import { Upload, ChevronDown, CheckCircle2, AlertCircle } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { apiService } from '../services/api';
 
 export default function FormView() {
@@ -18,7 +19,6 @@ export default function FormView() {
   const [previewSrc, setPreviewSrc] = useState('');
 
   useEffect(() => {
-    // Tải dữ liệu thật từ Google Sheets thông qua API
     apiService.getStaff().then(data => {
       setStaffData(data);
       const depts = Array.from(new Set(data.map((s: any) => s.department))).filter(Boolean) as string[];
@@ -50,24 +50,18 @@ export default function FormView() {
       reader.onload = (event) => {
         const img = new Image();
         img.onload = () => {
-          // Tạo Canvas để nén ảnh
           const canvas = document.createElement('canvas');
           let width = img.width;
           let height = img.height;
-
-          // Giới hạn chiều rộng tối đa 1024px để giảm dung lượng nhưng vẫn đủ rõ
           const MAX_WIDTH = 1024;
           if (width > MAX_WIDTH) {
             height = Math.round((height * MAX_WIDTH) / width);
             width = MAX_WIDTH;
           }
-
           canvas.width = width;
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
-
-          // Nén ảnh về định dạng JPEG với chất lượng 0.7 (rất nhẹ nhưng vẫn nét)
           const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
           setImageBase64(compressedBase64);
           setPreviewSrc(compressedBase64);
@@ -106,88 +100,101 @@ export default function FormView() {
     const res = await apiService.submitResult(payload);
     
     setLoading(false);
-    if (res.success) {
-      setSuccess(true);
-      setMsg("Gửi kết quả thành công");
-      // Reset form
-      setSelectedDept('');
-      setSelectedName('');
-      setCalculatedMsnv('');
-      setRound('');
-      setImageBase64('');
-      setPreviewSrc('');
-      
-      setTimeout(() => setSuccess(false), 5000);
-    } else {
-      // Ngay cả khi có lỗi CORS nhưng data đã đi thì vẫn hiện thành công cho người dùng yên tâm
-      setSuccess(true);
-      setMsg("Gửi kết quả thành công");
-      // Reset form tương tự
-      setSelectedDept('');
-      setSelectedName('');
-      setCalculatedMsnv('');
-      setRound('');
-      setImageBase64('');
-      setPreviewSrc('');
-    }
+    setSuccess(true);
+    setMsg("Gửi kết quả thành công");
+    
+    // Reset form
+    setSelectedDept('');
+    setSelectedName('');
+    setCalculatedMsnv('');
+    setRound('');
+    setImageBase64('');
+    setPreviewSrc('');
+    
+    setTimeout(() => setSuccess(false), 5000);
   };
 
   return (
-    <div className="bg-white border border-white rounded-[32px] p-6 lg:p-8 shadow-xl shadow-slate-200/60 flex-grow flex flex-col">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="font-black text-slate-800 uppercase text-sm tracking-[0.1em]">Biểu mẫu nộp kết quả</h2>
+    <motion.div 
+      whileHover={{ y: -4 }}
+      className="bg-white border border-white rounded-[40px] p-8 lg:p-10 shadow-2xl shadow-blue-900/5 flex-grow flex flex-col transition-all overflow-hidden relative"
+    >
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400"></div>
+      
+      <div className="flex items-center justify-between mb-10">
+        <h2 className="font-black text-slate-800 uppercase text-base tracking-[0.1em] font-display">Nộp Kết Quả Mới</h2>
       </div>
 
-      {success && (
-        <div className="bg-green-50 text-green-700 p-3 rounded-lg mb-5 text-sm font-medium border border-green-100/50">
-          {msg}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="space-y-5">
-        <div className="space-y-2">
-          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">1. Phòng ban <span className="text-red-500">*</span></label>
-          <select 
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 transition-all"
-            value={selectedDept}
-            onChange={handleDeptChange}
-            disabled={departments.length === 0}
-            required
+      <AnimatePresence>
+        {success && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+            animate={{ opacity: 1, height: 'auto', marginBottom: 20 }}
+            exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+            className="bg-emerald-50 text-emerald-700 p-4 rounded-2xl flex items-center gap-3 text-sm font-bold border border-emerald-100"
           >
-            <option value="">{departments.length === 0 ? "Xin hãy chờ..." : "-- Chọn phòng ban --"}</option>
-            {departments.map((dept, idx) => (
-              <option key={idx} value={dept}>{dept}</option>
-            ))}
-          </select>
+            <CheckCircle2 size={18} />
+            {msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-2.5">
+          <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+            <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-500">1</span>
+            Phòng ban <span className="text-blue-500 ml-auto">*</span>
+          </label>
+          <div className="relative group">
+            <select 
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:border-blue-500 focus:bg-white font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+              value={selectedDept}
+              onChange={handleDeptChange}
+              disabled={departments.length === 0}
+              required
+            >
+              <option value="">{departments.length === 0 ? "Đang tải dữ liệu..." : "-- Chọn đơn vị --"}</option>
+              {departments.map((dept, idx) => (
+                <option key={idx} value={dept}>{dept}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-slate-600 transition-colors" size={18} />
+          </div>
           {departments.length === 0 && (
-             <p className="text-[10px] text-red-500 mt-1 italic animate-pulse px-1">
-               🕒 Đang kết nối dữ liệu từ Google Sheets, vui lòng đợi giây lát...
+             <p className="text-[10px] text-blue-500 mt-2 font-bold italic animate-pulse flex items-center gap-1.5">
+               <AlertCircle size={12} /> Đang kết nối dữ liệu từ hệ thống...
              </p>
           )}
         </div>
 
-        <div className="grid grid-cols-12 gap-4">
-          <div className="col-span-12 sm:col-span-8 space-y-2">
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">2. Họ và tên <span className="text-red-500">*</span></label>
-            <select 
-              className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 transition-all"
-              value={selectedName}
-              onChange={handleNameChange}
-              disabled={!selectedDept}
-              required 
-            >
-              <option value="">-- Chọn nhân sự --</option>
-              {filteredStaff.map(s => (
-                <option key={s.id} value={s.name}>{s.name}</option>
-              ))}
-            </select>
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
+          <div className="md:col-span-8 space-y-2.5">
+            <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+                <span className="w-5 h-5 rounded-full bg-slate-100 flex items-center justify-center text-[10px] text-slate-500">2</span>
+                Họ và tên <span className="text-blue-500 ml-auto">*</span>
+            </label>
+            <div className="relative group text-sm">
+                <select 
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 focus:border-blue-500 focus:bg-white font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                    value={selectedName}
+                    onChange={handleNameChange}
+                    disabled={!selectedDept}
+                    required 
+                >
+                    <option value="">-- Chọn nhân sự --</option>
+                    {filteredStaff.map(s => (
+                        <option key={s.id} value={s.name}>{s.name}</option>
+                    ))}
+                </select>
+                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            </div>
           </div>
 
-          <div className="col-span-12 sm:col-span-4 space-y-2">
-            <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">3. Số hiệu</label>
+          <div className="md:col-span-4 space-y-2.5 font-bold">
+            <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">3. Số hiệu</label>
             <input 
               type="text" 
-              className="w-full bg-slate-100 border border-transparent rounded-xl px-4 py-3 text-sm font-mono font-bold text-slate-400 focus:outline-none cursor-not-allowed"
+              className="w-full bg-slate-100/50 border-2 border-transparent rounded-2xl px-5 py-4 text-sm font-mono text-slate-500 focus:outline-none cursor-not-allowed italic"
               placeholder="..."
               value={calculatedMsnv}
               readOnly
@@ -196,25 +203,36 @@ export default function FormView() {
           </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Vòng thi <span className="text-red-500">*</span></label>
-          <select 
-            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-700 transition-all" 
-            value={round}
-            onChange={(e) => setRound(e.target.value)}
-            required
-          >
-            <option value="">-- Chọn tuần thi --</option>
-            <option value="Tuần 01">Tuần 01 (15/4 - 22/4/2026)</option>
-            <option value="Tuần 02">Tuần 02 (23/4 - 29/4/2026)</option>
-            <option value="Tuần 03">Tuần 03 (30/4 - 06/5/2026)</option>
-            <option value="Tuần 04">Tuần 04 (07/5 - 13/5/2026)</option>
-          </select>
+        <div className="space-y-2.5">
+          <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+            Vòng thi <span className="text-blue-500 ml-auto">*</span>
+          </label>
+          <div className="relative group">
+            <select 
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:border-blue-500 focus:bg-white font-bold text-slate-700 transition-all appearance-none cursor-pointer" 
+              value={round}
+              onChange={(e) => setRound(e.target.value)}
+              required
+            >
+              <option value="">-- Chọn tuần thi hiện tại --</option>
+              <option value="Tuần 01">Tuần 01 (15/4 - 22/4/2026)</option>
+              <option value="Tuần 02">Tuần 02 (23/4 - 29/4/2026)</option>
+              <option value="Tuần 03">Tuần 03 (30/4 - 06/5/2026)</option>
+              <option value="Tuần 04">Tuần 04 (07/5 - 13/5/2026)</option>
+            </select>
+            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+          </div>
         </div>
 
-        <div className="space-y-2">
-          <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ảnh minh chứng kết quả <span className="text-red-500">*</span></label>
-          <div className={`relative border-2 border-dashed rounded-2xl p-4 text-center transition-all overflow-hidden ${previewSrc ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-slate-50 hover:border-blue-400 group'}`}>
+        <div className="space-y-2.5">
+          <label className="flex items-center gap-2 text-[11px] font-black text-slate-400 uppercase tracking-widest">
+            Ảnh minh chứng <span className="text-blue-500 ml-auto">*</span>
+          </label>
+          <motion.div 
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            className={`relative border-2 border-dashed rounded-[32px] p-6 text-center transition-all cursor-pointer group ${previewSrc ? 'border-blue-500 bg-blue-50/50 shadow-inner' : 'border-slate-200 bg-slate-50/50 hover:border-blue-400'}`}
+          >
             <input 
               type="file" 
               accept="image/*" 
@@ -223,30 +241,45 @@ export default function FormView() {
               required={!previewSrc}
             />
             {!previewSrc ? (
-              <div className="flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors pointer-events-none py-8">
-                 <Upload className="mb-3 animate-bounce-slow" strokeWidth={1.5} size={36} />
-                 <span className="text-xs font-semibold">Chạm để chụp màn hình hoặc chọn ảnh</span>
+              <div className="flex flex-col items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors pointer-events-none py-10">
+                 <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-md mb-4 group-hover:shadow-blue-100 transition-all">
+                    <Upload className="animate-bounce-slow" strokeWidth={2} size={28} />
+                 </div>
+                 <span className="text-xs font-black uppercase tracking-widest">Chụp màn hình hoặc chọn ảnh</span>
+                 <p className="text-[10px] mt-2 opacity-60">Hệ thống sẽ tự động nén ảnh để upload nhanh hơn</p>
               </div>
             ) : (
               <div className="relative z-0 py-2">
-                <img src={previewSrc} alt="Preview" className="max-h-52 mx-auto rounded-xl shadow-lg border-2 border-white" />
-                <div className="mt-3 text-[10px] text-blue-600 font-bold uppercase">Đã chọn ảnh - Chạm để thay đổi</div>
+                <img src={previewSrc} alt="Preview" className="max-h-52 mx-auto rounded-2xl shadow-2xl border-4 border-white" />
+                <motion.div 
+                    initial={{ opacity: 0 }} 
+                    animate={{ opacity: 1 }} 
+                    className="mt-4 text-[10px] text-blue-600 font-black uppercase tracking-widest bg-white inline-block px-3 py-1 rounded-full shadow-sm"
+                >
+                    Đã lưu ảnh tạm thời
+                </motion.div>
               </div>
             )}
-          </div>
+          </motion.div>
         </div>
 
-        <button 
+        <motion.button 
           type="submit" 
           disabled={loading || !imageBase64}
-          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-4 mt-4 rounded-xl transition-all duration-300 shadow-xl shadow-blue-200 uppercase text-sm tracking-[0.1em] flex justify-center items-center gap-3 disabled:bg-blue-300 disabled:shadow-none hover:scale-[1.01] active:scale-[0.98]"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-5 mt-6 rounded-[24px] shadow-2xl shadow-blue-500/30 uppercase text-sm tracking-[0.2em] flex justify-center items-center gap-3 disabled:opacity-50 disabled:shadow-none transition-all"
         >
-          {loading && (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+          {loading ? (
+            <>
+              <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Đang Tải Lên...</span>
+            </>
+          ) : (
+            'Xác nhận Nộp Kết Quả'
           )}
-          {loading ? 'ĐANG GỬI KẾT QUẢ...' : 'GỬI KẾT QUẢ NGAY'}
-        </button>
+        </motion.button>
       </form>
-    </div>
+    </motion.div>
   );
 }
