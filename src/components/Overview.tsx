@@ -232,7 +232,8 @@ export default function Overview() {
                 <div className="flex-grow overflow-auto px-8 pb-10 custom-scrollbar">
                    <div className="space-y-8">
                       {Object.entries(stats.unsubmittedByDept).map(([dept, list]) => {
-                        const filtered = list.filter(s => 
+                        const staffList = list as any[];
+                        const filtered = staffList.filter(s => 
                           s.name.toLowerCase().includes(searchUnsubmitted.toLowerCase()) || 
                           s.id.includes(searchUnsubmitted)
                         );
