@@ -7,6 +7,8 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
   const [filterMSNV, setFilterMSNV] = useState('');
   const [filterRound, setFilterRound] = useState('');
   const [selectedItem, setSelectedItem] = useState<{msnv:string, name:string, round:string, date:string, link:string, department:string} | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
   
   const loading = false; // Data is managed by parent App.tsx
 
@@ -16,6 +18,14 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
     const matchRound = filterRound === '' || item.round === filterRound;
     return matchMsnv && matchRound;
   });
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterMSNV, filterRound]);
+
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const paginatedData = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   return (
     <motion.div 
@@ -81,35 +91,35 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
             Không tìm thấy bản ghi phù hợp
           </motion.div>
         ) : (
-          <table className="w-full min-w-[500px] text-left border-separate border-spacing-y-3 font-sans">
+          <table className="w-full min-w-[450px] text-left border-separate border-spacing-y-2 font-sans">
             <thead className="sticky top-0 bg-white z-10">
-              <tr className="text-[10px] md:text-xs text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
-                <th className="pb-4 pt-0 px-3 md:px-6">Số hiệu</th>
-                <th className="pb-4 pt-0 px-3 md:px-6 font-sans">Thông tin Nhân sự</th>
-                <th className="pb-4 pt-0 px-3 md:px-6 font-sans text-right">Tuần thi</th>
+              <tr className="text-[9px] md:text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
+                <th className="pb-3 pt-0 px-3 md:px-4">Số hiệu</th>
+                <th className="pb-3 pt-0 px-3 md:px-4 font-sans">Nhân sự</th>
+                <th className="pb-3 pt-0 px-3 md:px-4 font-sans text-right">Tuần</th>
               </tr>
             </thead>
-            <tbody className="text-sm md:text-base font-bold font-sans">
-              {filtered.map((item, idx) => (
+            <tbody className="text-xs font-bold font-sans">
+              {paginatedData.map((item, idx) => (
                 <motion.tr 
                   key={idx} 
                   initial={{ opacity: 0, x: -10 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: idx * 0.03 }}
                   onClick={() => setSelectedItem(item)}
-                  className="bg-slate-50/50 hover:bg-blue-50/80 cursor-pointer transition-all group border border-transparent hover:border-blue-100 rounded-2xl overflow-hidden font-sans"
+                  className="bg-slate-50/50 hover:bg-blue-50/80 cursor-pointer transition-all group border border-transparent hover:border-blue-100 rounded-xl overflow-hidden font-sans"
                 >
-                  <td className="py-5 px-3 md:px-6 font-mono text-blue-600 first:rounded-l-2xl">
-                     <span className="bg-white px-2 py-1 rounded-lg border border-slate-100 shadow-sm text-xs md:text-sm">{item.msnv}</span>
+                  <td className="py-3 px-3 md:px-4 font-mono text-blue-600 first:rounded-l-xl">
+                     <span className="bg-white px-1.5 py-0.5 rounded-lg border border-slate-100 shadow-sm text-[10px] md:text-xs">{item.msnv}</span>
                   </td>
-                  <td className="py-5 px-3 md:px-6">
+                  <td className="py-3 px-3 md:px-4">
                      <div className="flex flex-col">
-                        <span className="text-slate-800 text-sm md:text-base group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
-                        <span className="text-[9px] md:text-[10px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || 'Đang cập nhật...'}</span>
+                        <span className="text-slate-800 text-xs md:text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
+                        <span className="text-[8px] md:text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || '...'}</span>
                      </div>
                   </td>
-                  <td className="py-5 px-3 md:px-6 last:rounded-r-2xl text-right">
-                    <span className="bg-blue-600 text-white px-3 md:px-4 py-1 md:py-1.5 rounded-full font-black text-[9px] md:text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 font-sans">
+                  <td className="py-3 px-3 md:px-4 last:rounded-r-xl text-right">
+                    <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[8px] md:text-[9px] uppercase tracking-widest shadow-md shadow-blue-500/10 font-sans">
                       {item.round}
                     </span>
                   </td>
@@ -120,14 +130,52 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
         )}
       </div>
 
+      {filtered.length > pageSize && (
+        <div className="mt-6 flex items-center justify-center gap-2">
+          <button 
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(p => p - 1)}
+            className="p-2 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 disabled:opacity-30 hover:bg-white hover:text-blue-600 transition-all font-black text-[10px]"
+          >
+            TRƯỚC
+          </button>
+          <div className="flex items-center gap-1">
+            {Array.from({ length: totalPages }).map((_, i) => {
+              const p = i + 1;
+              // Only show 5 pages near current or edges
+              if (totalPages > 5 && Math.abs(p - currentPage) > 1 && p !== 1 && p !== totalPages) {
+                if (p === 2 || p === totalPages - 1) return <span key={p} className="text-slate-300">...</span>;
+                return null;
+              }
+              return (
+                <button
+                  key={p}
+                  onClick={() => setCurrentPage(p)}
+                  className={`w-8 h-8 rounded-xl font-black text-[10px] transition-all ${currentPage === p ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/30' : 'bg-slate-50 text-slate-400 hover:bg-white hover:text-blue-600'}`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+          </div>
+          <button 
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(p => p + 1)}
+            className="p-2 rounded-xl bg-slate-50 border border-slate-100 text-slate-400 disabled:opacity-30 hover:bg-white hover:text-blue-600 transition-all font-black text-[10px]"
+          >
+            SAU
+          </button>
+        </div>
+      )}
+
       <AnimatePresence>
         {selectedItem && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-start justify-center p-4 overflow-y-auto pt-10 sm:pt-20">
             <motion.div 
                initial={{ opacity: 0 }}
                animate={{ opacity: 1 }}
                exit={{ opacity: 0 }}
-               className="absolute inset-0 bg-slate-900/60 backdrop-blur-md" 
+               className="fixed inset-0 bg-slate-900/60 backdrop-blur-md" 
                onClick={() => setSelectedItem(null)} 
             />
             <motion.div 

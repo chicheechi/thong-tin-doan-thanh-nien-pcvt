@@ -1,6 +1,6 @@
 {
-  "name": "Thu Thập Kết Quả Thi Đoàn Thanh niên PCVT",
-  "description": "Ứng dụng thu thập thông tin và kết quả thi của Đoàn Thanh niên PCVT.",
+  "name": "Thu thập kết quả cuộc thi - Đoàn thanh niên",
+  "description": "Ứng dụng thu thập thông tin và kết quả thi của Đoàn Thanh niên.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }
