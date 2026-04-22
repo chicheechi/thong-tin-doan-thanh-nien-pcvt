@@ -291,4 +291,13 @@ export const mockStaff = [
   }
 ];
 
-export const mockHistory: any[] = [];
+export const mockHistory: any[] = [
+  {
+    msnv: "012682",
+    name: "Vũ Huỳnh Thảo My",
+    department: "Văn phòng",
+    round: "Tuần 01",
+    date: "15/04/2026",
+    link: "https://drive.google.com"
+  }
+];
