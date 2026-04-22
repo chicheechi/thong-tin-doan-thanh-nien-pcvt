@@ -147,7 +147,7 @@ export default function FormView() {
           </label>
           <div className="relative group">
             <select 
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:border-blue-500 focus:bg-white font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-700 transition-all appearance-none cursor-pointer"
               value={selectedDept}
               onChange={handleDeptChange}
               disabled={departments.length === 0}
@@ -158,7 +158,7 @@ export default function FormView() {
                 <option key={idx} value={dept}>{dept}</option>
               ))}
             </select>
-            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-slate-600 transition-colors" size={18} />
+            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors" size={18} />
           </div>
           {departments.length === 0 && (
              <p className="text-[10px] text-blue-500 mt-2 font-bold italic animate-pulse flex items-center gap-1.5">
@@ -175,7 +175,7 @@ export default function FormView() {
             </label>
             <div className="relative group text-sm">
                 <select 
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 focus:border-blue-500 focus:bg-white font-bold text-slate-700 transition-all appearance-none cursor-pointer"
+                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-700 transition-all appearance-none cursor-pointer"
                     value={selectedName}
                     onChange={handleNameChange}
                     disabled={!selectedDept}
@@ -186,7 +186,7 @@ export default function FormView() {
                         <option key={s.id} value={s.name}>{s.name}</option>
                     ))}
                 </select>
-                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+                <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors" size={18} />
             </div>
           </div>
 
@@ -194,7 +194,7 @@ export default function FormView() {
             <label className="block text-[11px] font-black text-slate-400 uppercase tracking-widest">3. Số hiệu</label>
             <input 
               type="text" 
-              className="w-full bg-slate-100/50 border-2 border-transparent rounded-2xl px-5 py-4 text-sm font-mono text-slate-500 focus:outline-none cursor-not-allowed italic"
+              className="w-full bg-slate-100/50 border-2 border-transparent rounded-2xl px-5 py-4 text-sm font-mono text-slate-500 focus:outline-none cursor-not-allowed italic font-black"
               placeholder="..."
               value={calculatedMsnv}
               readOnly
@@ -209,7 +209,7 @@ export default function FormView() {
           </label>
           <div className="relative group">
             <select 
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:border-blue-500 focus:bg-white font-bold text-slate-700 transition-all appearance-none cursor-pointer" 
+              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-5 py-4 text-sm focus:border-blue-400 focus:bg-white focus:ring-4 focus:ring-blue-500/10 font-bold text-slate-700 transition-all appearance-none cursor-pointer" 
               value={round}
               onChange={(e) => setRound(e.target.value)}
               required
@@ -220,7 +220,7 @@ export default function FormView() {
               <option value="Tuần 03">Tuần 03 (30/4 - 06/5/2026)</option>
               <option value="Tuần 04">Tuần 04 (07/5 - 13/5/2026)</option>
             </select>
-            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={18} />
+            <ChevronDown className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors" size={18} />
           </div>
         </div>
 
@@ -231,7 +231,7 @@ export default function FormView() {
           <motion.div 
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
-            className={`relative border-2 border-dashed rounded-[32px] p-6 text-center transition-all cursor-pointer group ${previewSrc ? 'border-blue-500 bg-blue-50/50 shadow-inner' : 'border-slate-200 bg-slate-50/50 hover:border-blue-400'}`}
+            className={`relative border-2 border-dashed rounded-[32px] p-6 text-center transition-all cursor-pointer group overflow-hidden ${previewSrc ? 'border-blue-500 bg-blue-50/50 shadow-inner' : 'border-slate-200 bg-gradient-to-b from-slate-50/50 to-slate-100/50 hover:border-blue-400 shadow-sm'}`}
           >
             <input 
               type="file" 

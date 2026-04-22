@@ -49,7 +49,7 @@ export default function HistoryView() {
           <div className="relative group hidden sm:block">
             <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500 transition-colors" size={14} />
             <select 
-              className="text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 font-bold text-slate-600 focus:border-blue-500 focus:bg-white transition-all cursor-pointer appearance-none min-w-[140px]"
+              className="text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 font-bold text-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all cursor-pointer appearance-none min-w-[140px]"
               value={filterRound}
               onChange={e => setFilterRound(e.target.value)}
             >
@@ -65,7 +65,7 @@ export default function HistoryView() {
             <input 
               type="text" 
               placeholder="Tìm nhân sự..." 
-              className="text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 w-40 font-bold text-slate-600 focus:border-blue-500 focus:bg-white placeholder:font-bold placeholder:text-slate-300 transition-all font-sans"
+              className="text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 w-40 font-bold text-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 focus:bg-white placeholder:font-bold placeholder:text-slate-300 transition-all font-sans"
               value={filterMSNV}
               onChange={e => setFilterMSNV(e.target.value)}
             />
@@ -88,7 +88,7 @@ export default function HistoryView() {
             Không tìm thấy bản ghi phù hợp
           </motion.div>
         ) : (
-          <table className="w-full text-left border-separate border-spacing-y-3 font-sans">
+          <table className="w-full min-w-[550px] text-left border-separate border-spacing-y-3 font-sans">
             <thead className="sticky top-0 bg-white z-10">
               <tr className="text-[10px] text-slate-400 uppercase font-black tracking-[0.2em] font-sans">
                 <th className="pb-4 pt-0 px-6">Số hiệu</th>

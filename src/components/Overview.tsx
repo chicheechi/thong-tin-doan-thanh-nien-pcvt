@@ -74,44 +74,49 @@ export default function Overview() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <motion.div 
           whileHover={{ y: -4 }}
-          className="bg-white p-8 rounded-[32px] shadow-xl shadow-blue-900/5 border border-white relative overflow-hidden group"
+          className="bg-gradient-to-b from-white to-slate-50/50 p-8 rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
         >
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-            <Users size={80} />
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-200 to-slate-100"></div>
+          <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
+            <Users size={100} />
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Tổng số nhân sự</p>
-          <h3 className="text-4xl font-black text-slate-800">{stats.totalStaff}</h3>
-          <p className="text-xs text-slate-400 mt-2 font-bold tracking-tight">Thành viên Đoàn thanh niên</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 relative z-10">Tổng số nhân sự</p>
+          <h3 className="text-4xl font-black text-slate-800 tracking-tight relative z-10">{stats.totalStaff}</h3>
+          <p className="text-xs text-slate-400 mt-2 font-bold tracking-tight relative z-10">Thành viên Đoàn thanh niên</p>
         </motion.div>
 
         <motion.div 
           whileHover={{ y: -4 }}
-          className="bg-blue-600 p-8 rounded-[32px] shadow-xl shadow-blue-600/20 border border-blue-500 relative overflow-hidden group"
+          className="bg-gradient-to-br from-blue-600 via-blue-600 to-blue-800 p-8 rounded-[32px] shadow-2xl shadow-blue-600/30 border border-blue-500 relative overflow-hidden group"
         >
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-300"></div>
           <div className="absolute top-0 right-0 p-4 opacity-10 text-white group-hover:scale-110 transition-transform">
-            <CheckCircle2 size={80} />
+            <CheckCircle2 size={100} />
           </div>
-          <p className="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-2">Tổng lượt nộp</p>
-          <h3 className="text-4xl font-black text-white">{stats.totalSubmissions}</h3>
-          <p className="text-xs text-blue-100/70 mt-2 font-bold tracking-tight">Đã ghi nhận trên hệ thống</p>
+          <p className="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-2 relative z-10">Tổng lượt nộp</p>
+          <h3 className="text-4xl font-black text-white tracking-tight relative z-10">{stats.totalSubmissions}</h3>
+          <p className="text-xs text-blue-100/70 mt-2 font-bold tracking-tight relative z-10">Đã ghi nhận trên hệ thống</p>
         </motion.div>
 
         <motion.div 
           whileHover={{ y: -4 }}
-          className="bg-white p-8 rounded-[32px] shadow-xl shadow-blue-900/5 border border-white relative overflow-hidden group"
+          className="bg-gradient-to-b from-white to-slate-50/50 p-8 rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
         >
-          <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-110 transition-transform">
-            <TrendingUp size={80} />
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-300"></div>
+          <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
+            <TrendingUp size={100} />
           </div>
-          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Tỉ lệ trung bình</p>
-          <h3 className="text-4xl font-black text-slate-800">{Math.round(stats.rounds.reduce((a, b) => a + b.percentage, 0) / 4)}%</h3>
-          <p className="text-xs text-slate-400 mt-2 font-bold tracking-tight">Hoàn thành qua các tuần</p>
+          <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 relative z-10">Tỉ lệ trung bình</p>
+          <h3 className="text-4xl font-black text-slate-800 tracking-tight relative z-10">{Math.round(stats.rounds.reduce((a, b) => a + b.percentage, 0) / 4)}%</h3>
+          <p className="text-xs text-slate-400 mt-2 font-bold tracking-tight relative z-10">Hoàn thành qua các tuần</p>
         </motion.div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white">
-          <div className="flex items-center gap-3 mb-10">
+        <div className="lg:col-span-8 bg-white/80 backdrop-blur-xl p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-blue-400 via-blue-600 to-transparent"></div>
+          
+          <div className="flex items-center gap-3 mb-10 relative z-10">
             <div className="p-2.5 bg-blue-50 rounded-2xl text-blue-600 shadow-inner">
                <BarChart3 size={20} />
             </div>
@@ -121,73 +126,89 @@ export default function Overview() {
             </div>
           </div>
           
-          <div className="h-[350px] w-full">
+          <div className="h-[350px] w-full relative z-10">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.rounds} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                <defs>
+                  <linearGradient id="colorPercentage" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#2563EB" stopOpacity={1}/>
+                    <stop offset="95%" stopColor="#60A5FA" stopOpacity={0.8}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
                 <XAxis 
                   dataKey="name" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }}
+                  tick={{ fill: '#64748B', fontSize: 11, fontWeight: 800 }}
                   dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#94A3B8', fontSize: 10, fontWeight: 900 }}
+                  tick={{ fill: '#64748B', fontSize: 11, fontWeight: 800 }}
                   unit="%"
                 />
                 <Tooltip 
-                  cursor={{ fill: '#F8FAFC' }}
-                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
+                  cursor={{ fill: '#F1F5F9', opacity: 0.4 }}
+                  contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)', padding: '16px', fontWeight: 'bold' }}
+                  itemStyle={{ color: '#1E293B' }}
                 />
                 <Bar 
                   dataKey="percentage" 
                   name="Tỉ lệ hoàn thành" 
-                  fill="#2563EB" 
+                  fill="url(#colorPercentage)" 
                   radius={[8, 8, 0, 0]} 
-                  barSize={40}
+                  barSize={48}
                 />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="lg:col-span-4 bg-white p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white flex flex-col">
-          <div className="flex items-center gap-3 mb-10">
-            <div className="p-2.5 bg-blue-50 rounded-2xl text-blue-600 shadow-inner">
+        <div className="lg:col-span-4 bg-white/80 backdrop-blur-xl p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white flex flex-col relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-emerald-400 via-emerald-500 to-transparent"></div>
+          
+          <div className="flex items-center gap-3 mb-10 relative z-10">
+            <div className="p-2.5 bg-emerald-50 rounded-2xl text-emerald-600 shadow-inner">
                <Award size={20} />
             </div>
             <div>
                <h2 className="font-black text-slate-800 uppercase text-base tracking-[0.1em] font-display">Chi tiết tuần</h2>
+               <p className="text-[10px] text-slate-400 mt-0.5 uppercase font-black tracking-widest">Tiến độ chi tiết</p>
             </div>
           </div>
           
-          <div className="space-y-4 flex-grow">
+          <div className="space-y-4 flex-grow relative z-10">
             {stats.rounds.map((round, idx) => (
-              <div key={idx} className="p-4 rounded-3xl bg-slate-50 border border-slate-100 group hover:bg-blue-50 transition-all">
-                <div className="flex items-center justify-between mb-2">
+              <motion.div 
+                key={idx} 
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="p-4.5 rounded-[24px] bg-slate-50/80 border border-slate-100 group hover:shadow-lg hover:shadow-slate-200/50 transition-all hover:-translate-y-1"
+              >
+                <div className="flex items-center justify-between mb-3">
                   <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">{round.name}</span>
-                  <span className="text-xs font-black text-slate-800">{round.percentage}%</span>
+                  <span className="text-base font-black text-slate-800 tracking-tight">{round.percentage}%</span>
                 </div>
-                <div className="w-full h-2 bg-white rounded-full overflow-hidden shadow-inner flex">
+                <div className="w-full h-2.5 bg-slate-200/60 rounded-full overflow-hidden shadow-inner flex mb-3">
                   <motion.div 
                     initial={{ width: 0 }}
                     animate={{ width: `${round.percentage}%` }}
-                    transition={{ duration: 1, delay: idx * 0.1 }}
-                    className="h-full bg-blue-600 rounded-full"
+                    transition={{ duration: 1.5, delay: 0.2 + idx * 0.1, ease: 'easeOut' }}
+                    className={`h-full rounded-full ${round.percentage >= 80 ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-blue-500 to-blue-600'}`}
                   />
                 </div>
-                <div className="mt-2 flex justify-between items-center">
-                  <span className="text-[9px] text-slate-400 font-bold bg-white px-2 py-0.5 rounded-full shadow-sm">{round.count} lượt nộp</span>
+                <div className="flex justify-between items-center">
+                  <span className="text-[10px] text-slate-500 font-bold bg-white px-2.5 py-1 rounded-full shadow-sm border border-slate-100">{round.count} lượt nộp</span>
                   {round.percentage >= 80 && (
-                    <span className="text-[9px] text-emerald-500 font-black uppercase flex items-center gap-1">
-                      <CheckCircle2 size={10} /> Đạt chỉ tiêu
+                    <span className="text-[9px] text-emerald-600 font-black uppercase flex items-center gap-1.5 bg-emerald-50 px-2 py-1 rounded-full">
+                      <CheckCircle2 size={12} className="text-emerald-500" /> Đạt chỉ tiêu
                     </span>
                   )}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
