@@ -111,17 +111,12 @@ function saveImage(base64Data, msnv, round, department, name) {
   let rootFolders = DriveApp.getFoldersByName(IMAGE_FOLDER_NAME);
   let rootFolder = rootFolders.hasNext() ? rootFolders.next() : DriveApp.createFolder(IMAGE_FOLDER_NAME);
 
-  // 2. Thư mục Vòng thi (MỚI)
-  let roundName = round ? round : 'Chưa xác định';
-  let roundFolders = rootFolder.getFoldersByName(roundName);
-  let roundFolder = roundFolders.hasNext() ? roundFolders.next() : rootFolder.createFolder(roundName);
-
-  // 3. Thư mục Phòng ban
+  // 2. Thư mục Phòng ban (Gắn trực tiếp vào thư mục gốc)
   let deptName = department ? department : 'Khác';
-  let deptFolders = roundFolder.getFoldersByName(deptName);
-  let deptFolder = deptFolders.hasNext() ? deptFolders.next() : roundFolder.createFolder(deptName);
+  let deptFolders = rootFolder.getFoldersByName(deptName);
+  let deptFolder = deptFolders.hasNext() ? deptFolders.next() : rootFolder.createFolder(deptName);
 
-  // 4. Thư mục Cá nhân (MSNV - Họ Tên)
+  // 3. Thư mục Cá nhân (MSNV - Họ Tên)
   let empFolderName = msnv + ' - ' + name;
   let empFolders = deptFolder.getFoldersByName(empFolderName);
   let empFolder = empFolders.hasNext() ? empFolders.next() : deptFolder.createFolder(empFolderName);
