@@ -6,6 +6,7 @@ import { apiService } from '../services/api';
 export default function HistoryView({ historyData }: { historyData: any[] }) {
   const [filterMSNV, setFilterMSNV] = useState('');
   const [filterRound, setFilterRound] = useState('');
+  const [statusTab, setStatusTab] = useState<'all' | 'certified' | 'uncertified'>('all');
   const [selectedItem, setSelectedItem] = useState<any | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
@@ -16,13 +17,21 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
     const matchMsnv = (item.msnv || '').toString().toLowerCase().includes(filterMSNV.toLowerCase()) || 
                       (item.name || '').toString().toLowerCase().includes(filterMSNV.toLowerCase());
     const matchRound = filterRound === '' || item.round === filterRound;
-    return matchMsnv && matchRound;
+    
+    let matchStatus = true;
+    if (statusTab === 'certified') {
+      matchStatus = item.status === 'Đã có chứng nhận' || item.status === 'Có chứng nhận' || item.status?.includes('Có');
+    } else if (statusTab === 'uncertified') {
+      matchStatus = item.status === 'Chưa có chứng nhận' || item.status === 'Chưa có' || !item.status || item.status?.includes('Chưa');
+    }
+
+    return matchMsnv && matchRound && matchStatus;
   });
 
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [filterMSNV, filterRound]);
+  }, [filterMSNV, filterRound, statusTab]);
 
   const totalPages = Math.ceil(filtered.length / pageSize);
   const paginatedData = filtered.slice((currentPage - 1) * pageSize, currentPage * pageSize);
@@ -34,14 +43,13 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
     >
       <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-blue-400 via-blue-600 to-transparent"></div>
       
-      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 items-start xl:items-center justify-between mb-8 sm:mb-10 w-full">
+      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 items-start xl:items-center justify-between mb-6 w-full">
         <div className="flex items-center gap-3">
            <div className="p-2.5 bg-blue-50 rounded-2xl text-blue-600 shadow-inner">
               <History size={20} />
            </div>
            <div>
               <h2 className="font-black text-slate-800 uppercase text-base tracking-[0.1em] font-display">Lịch Sử Hoàn Thành</h2>
-
            </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-3 items-stretch md:items-center w-full sm:w-auto h-full sm:ml-auto">
@@ -71,6 +79,27 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
             />
           </div>
         </div>
+      </div>
+
+      <div className="flex gap-2 mb-6 sm:mb-8 overflow-x-auto pb-2 custom-scrollbar">
+         <button 
+            onClick={() => setStatusTab('all')}
+            className={`px-4 py-2 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${statusTab === 'all' ? 'bg-slate-800 text-white shadow-md' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}
+         >
+            Đã nộp kết quả
+         </button>
+         <button 
+            onClick={() => setStatusTab('certified')}
+            className={`px-4 py-2 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${statusTab === 'certified' ? 'bg-emerald-600 text-white shadow-md shadow-emerald-500/20' : 'bg-emerald-50 text-emerald-600 hover:bg-emerald-100'}`}
+         >
+            Có chứng nhận
+         </button>
+         <button 
+            onClick={() => setStatusTab('uncertified')}
+            className={`px-4 py-2 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest whitespace-nowrap transition-all ${statusTab === 'uncertified' ? 'bg-red-500 text-white shadow-md shadow-red-500/20' : 'bg-red-50 text-red-500 hover:bg-red-100'}`}
+         >
+            Chưa có chứng nhận
+         </button>
       </div>
 
       <div className="flex-grow overflow-auto flex flex-col custom-scrollbar pr-2 -mr-2">
@@ -114,6 +143,7 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                      <div className="flex flex-col">
                         <span className="text-slate-800 text-xs md:text-sm group-hover:text-blue-700 transition-colors uppercase font-display font-black">{item.name}</span>
                         <span className="text-[8px] md:text-[9px] text-slate-400 uppercase tracking-widest mt-0.5 font-sans font-bold">{item.department || '...'}</span>
+                        {item.timestamp && <span className="text-[8px] text-slate-300 mt-1">{item.timestamp}</span>}
                      </div>
                   </td>
                   <td className="py-3 px-3 md:px-4 text-center">
@@ -240,7 +270,7 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                         <Info size={20} />
                      </div>
                      <div className="flex flex-col">
-                        <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-1.5 font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700/60' : 'text-red-700/60'}`}>Trạng Thái AI</span>
+                        <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-1.5 font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700/60' : 'text-red-700/60'}`}>Trạng Thái</span>
                         <span className={`font-bold text-sm font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700' : 'text-red-700'}`}>{selectedItem.status}</span>
                      </div>
                   </div>

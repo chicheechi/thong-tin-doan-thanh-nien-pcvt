@@ -84,23 +84,6 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
     }
 
     setLoading(true);
-    setMsg('Đang phân tích hình ảnh (AI)...');
-    
-    let analysisResult = "Chưa có chứng nhận";
-    try {
-      const analyzeRes = await fetch("/api/analyze-certificate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ imageBase64 })
-      });
-      if (analyzeRes.ok) {
-        const data = await analyzeRes.json();
-        analysisResult = data.result || "Chưa có chứng nhận";
-      }
-    } catch (e) {
-      console.error("Lỗi khi phân tích ảnh:", e);
-    }
-
     setMsg('Đang gửi dữ liệu...');
 
     const payload = {
@@ -109,8 +92,7 @@ export default function FormView({ staffData, onSubmitted }: { staffData: any[],
       department: selectedDept,
       round: round,
       date: '',
-      imageBase64: imageBase64,
-      status: analysisResult
+      imageBase64: imageBase64
     };
 
     const res = await apiService.submitResult(payload);

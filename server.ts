@@ -24,40 +24,36 @@ async function startServer() {
       }
 
       // Initialize Gemini AI
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      if (!process.env.GEMINI_API_KEY) {
+        console.error("GEMINI_API_KEY is missing");
+        res.status(500).json({ error: "Configuration error" });
+        return;
+      }
+      const genAI = new GoogleGenAI(process.env.GEMINI_API_KEY);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
       // Clean base64 string
       const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
 
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                inlineData: {
-                  data: base64Data,
-                  mimeType: "image/jpeg"
-                }
-              },
-              {
-                text: "Hãy nhìn vào bức ảnh này và cho tôi biết đây có phải là hình ảnh chụp một giấy chứng nhận, bằng khen, hoặc kết quả hoàn thành bài thi hợp lệ không? Trả lời chính xác bằng 1 trong 2 cụm từ sau, không thêm bất kỳ chữ nào khác: 'Đã có chứng nhận' hoặc 'Chưa có chứng nhận'."
-              }
-            ]
+      const result = await model.generateContent([
+        {
+          inlineData: {
+            data: base64Data,
+            mimeType: "image/jpeg"
           }
-        ]
-      });
+        },
+        "Hãy nhìn vào bức ảnh này và cho tôi biết đây có phải là hình ảnh chụp một giấy chứng nhận, bằng khen, hoặc kết quả hoàn thành bài thi hợp lệ không? Trả lời chính xác bằng 1 trong 2 cụm từ sau, không thêm bất kỳ chữ nào khác: 'Đã có chứng nhận' hoặc 'Chưa có chứng nhận'."
+      ]);
 
-      const text = response.text()?.trim() || "Chưa có chứng nhận";
+      const text = result.response.text()?.trim() || "Chưa có chứng nhận";
       
       // Ensure strict output
-      let result = "Chưa có chứng nhận";
+      let finalResult = "Chưa có chứng nhận";
       if (text.includes("Đã có chứng nhận")) {
-        result = "Đã có chứng nhận";
+        finalResult = "Đã có chứng nhận";
       }
 
-      res.json({ result });
+      res.json({ result: finalResult });
     } catch (error) {
       console.error("Gemini Error:", error);
       res.status(500).json({ error: "Lỗi khi phân tích hình ảnh" });
@@ -72,8 +68,8 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    // Production: serve static files
-    const distPath = path.join(__dirname, "dist");
+    // Production: serve static files from the dist directory
+    const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
       res.sendFile(path.join(distPath, "index.html"));
