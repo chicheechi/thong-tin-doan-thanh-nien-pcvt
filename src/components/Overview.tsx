@@ -98,7 +98,7 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
           whileHover={{ y: -4, scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={() => setShowModal(true)}
-          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group cursor-pointer"
+          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group cursor-pointer col-span-2 lg:col-span-1"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 text-white group-hover:scale-110 transition-transform">
             <UserMinus size={80} />
@@ -108,17 +108,6 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
             {stats.unsubmittedCount} 
             <span className="text-[8px] bg-white/20 px-2 py-0.5 rounded-full font-bold animate-pulse">XEM DANH SÁCH</span>
           </h3>
-        </motion.div>
-
-        <motion.div 
-          whileHover={{ y: -4 }}
-          className="bg-gradient-to-b from-white to-slate-50/50 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
-        >
-          <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
-            <TrendingUp size={80} />
-          </div>
-          <p className="text-[9px] sm:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">TỈ LỆ</p>
-          <h3 className="text-2xl sm:text-4xl font-black text-slate-800 tracking-tight relative z-10">{Math.round(stats.rounds.reduce((a, b) => a + b.percentage, 0) / 4)}%</h3>
         </motion.div>
       </div>
 
