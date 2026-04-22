@@ -117,12 +117,12 @@ export default function FormView() {
   return (
     <motion.div 
       whileHover={{ y: -4 }}
-      className="bg-white border border-white rounded-[40px] p-8 lg:p-10 shadow-2xl shadow-blue-900/5 flex-grow flex flex-col transition-all overflow-hidden relative"
+      className="bg-white border border-white rounded-[32px] sm:rounded-[40px] p-6 md:p-8 lg:p-10 shadow-2xl shadow-blue-900/5 flex-grow flex flex-col transition-all overflow-hidden relative"
     >
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 via-blue-600 to-blue-400"></div>
       
-      <div className="flex items-center justify-between mb-10">
-        <h2 className="font-black text-slate-800 uppercase text-base tracking-[0.1em] font-display">Nộp Kết Quả Mới</h2>
+      <div className="flex items-center justify-between mb-8 sm:mb-10">
+        <h2 className="font-black text-slate-800 uppercase text-sm sm:text-base tracking-[0.1em] font-display">Nộp Kết Quả Mới</h2>
       </div>
 
       <AnimatePresence>

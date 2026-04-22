@@ -35,28 +35,28 @@ export default function App() {
                 referrerPolicy="no-referrer"
               />
             </motion.div>
-            <div className="text-center sm:text-left max-w-2xl">
-              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight uppercase font-display italic text-balance bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-600">
-                Thu thập kết quả thi Tìm hiểu về cuộc đời và sự nghiệp của Tổng Bí thư Hà Huy Tập
+            <div className="text-center sm:text-left max-w-3xl">
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-black tracking-tight leading-tight font-display text-balance bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700">
+                Thu thập kết quả Cuộc thi Tìm hiểu về cuộc đời và sự nghiệp của Tổng Bí thư Hà Huy Tập
               </h1>
-              <div className="flex items-center gap-3 mt-3 justify-center sm:justify-start">
+              <div className="flex items-center gap-3 mt-4 justify-center sm:justify-start">
                 <span className="w-10 h-[3px] bg-gradient-to-r from-blue-600 to-blue-400 rounded-full shadow-sm"></span>
                 <p className="text-[10px] sm:text-xs text-blue-600 font-black uppercase tracking-[0.3em]">Đoàn Thanh Niên PC Vũng Tàu</p>
               </div>
             </div>
           </div>
 
-          <div className="flex bg-slate-100/60 p-1.5 rounded-full border border-slate-200 backdrop-blur-md self-center shadow-inner">
+          <div className="flex flex-col sm:flex-row bg-slate-100/60 p-1.5 rounded-[20px] sm:rounded-full border border-slate-200 backdrop-blur-md self-center shadow-inner w-full sm:w-auto overflow-hidden">
             <button 
               onClick={() => setActiveTab('overview')}
-              className={`flex items-center gap-2 px-6 sm:px-10 py-3 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-500 ${activeTab === 'overview' ? 'bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02] ring-1 ring-white/20' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}`}
+              className={`flex-1 flex justify-center items-center gap-2 px-3 sm:px-10 py-3 rounded-[14px] sm:rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${activeTab === 'overview' ? 'bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02] ring-1 ring-white/20' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}`}
             >
               <BarChart2 size={16} />
               Tổng quan thống kê
             </button>
             <button 
               onClick={() => setActiveTab('main')}
-              className={`flex items-center gap-2 px-6 sm:px-10 py-3 rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-500 ${activeTab === 'main' ? 'bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02] ring-1 ring-white/20' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}`}
+              className={`flex-1 flex justify-center items-center gap-2 px-3 sm:px-10 py-3 rounded-[14px] sm:rounded-full text-[10px] sm:text-xs font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${activeTab === 'main' ? 'bg-gradient-to-b from-blue-500 to-blue-600 text-white shadow-lg shadow-blue-500/30 scale-[1.02] ring-1 ring-white/20' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-200/50'}`}
             >
               <ClipboardCheck size={16} />
               Nộp bài & Lịch sử

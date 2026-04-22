@@ -70,63 +70,63 @@ export default function Overview() {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div className="space-y-6 sm:space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         <motion.div 
           whileHover={{ y: -4 }}
-          className="bg-gradient-to-b from-white to-slate-50/50 p-8 rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
+          className="bg-gradient-to-b from-white to-slate-50/50 p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-slate-200 to-slate-100"></div>
           <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
             <Users size={100} />
           </div>
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 relative z-10">Tổng số nhân sự</p>
-          <h3 className="text-4xl font-black text-slate-800 tracking-tight relative z-10">{stats.totalStaff}</h3>
-          <p className="text-xs text-slate-400 mt-2 font-bold tracking-tight relative z-10">Thành viên Đoàn thanh niên</p>
+          <h3 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight relative z-10">{stats.totalStaff}</h3>
+          <p className="text-[10px] sm:text-xs text-slate-400 mt-2 font-bold tracking-tight relative z-10">Thành viên Đoàn thanh niên</p>
         </motion.div>
 
         <motion.div 
           whileHover={{ y: -4 }}
-          className="bg-gradient-to-br from-blue-600 via-blue-600 to-blue-800 p-8 rounded-[32px] shadow-2xl shadow-blue-600/30 border border-blue-500 relative overflow-hidden group"
+          className="bg-gradient-to-br from-blue-600 via-blue-600 to-blue-800 p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-blue-600/30 border border-blue-500 relative overflow-hidden group"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-300"></div>
           <div className="absolute top-0 right-0 p-4 opacity-10 text-white group-hover:scale-110 transition-transform">
             <CheckCircle2 size={100} />
           </div>
           <p className="text-[10px] font-black text-blue-100 uppercase tracking-widest mb-2 relative z-10">Tổng lượt nộp</p>
-          <h3 className="text-4xl font-black text-white tracking-tight relative z-10">{stats.totalSubmissions}</h3>
-          <p className="text-xs text-blue-100/70 mt-2 font-bold tracking-tight relative z-10">Đã ghi nhận trên hệ thống</p>
+          <h3 className="text-3xl sm:text-4xl font-black text-white tracking-tight relative z-10">{stats.totalSubmissions}</h3>
+          <p className="text-[10px] sm:text-xs text-blue-100/70 mt-2 font-bold tracking-tight relative z-10">Đã ghi nhận trên hệ thống</p>
         </motion.div>
 
         <motion.div 
           whileHover={{ y: -4 }}
-          className="bg-gradient-to-b from-white to-slate-50/50 p-8 rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
+          className="bg-gradient-to-b from-white to-slate-50/50 p-6 sm:p-8 rounded-[24px] sm:rounded-[32px] shadow-xl shadow-slate-200/40 border border-white relative overflow-hidden group"
         >
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-400 to-emerald-300"></div>
           <div className="absolute top-0 right-0 p-4 opacity-[0.03] group-hover:scale-110 transition-transform">
             <TrendingUp size={100} />
           </div>
           <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 relative z-10">Tỉ lệ trung bình</p>
-          <h3 className="text-4xl font-black text-slate-800 tracking-tight relative z-10">{Math.round(stats.rounds.reduce((a, b) => a + b.percentage, 0) / 4)}%</h3>
-          <p className="text-xs text-slate-400 mt-2 font-bold tracking-tight relative z-10">Hoàn thành qua các tuần</p>
+          <h3 className="text-3xl sm:text-4xl font-black text-slate-800 tracking-tight relative z-10">{Math.round(stats.rounds.reduce((a, b) => a + b.percentage, 0) / 4)}%</h3>
+          <p className="text-[10px] sm:text-xs text-slate-400 mt-2 font-bold tracking-tight relative z-10">Hoàn thành qua các tuần</p>
         </motion.div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
-        <div className="lg:col-span-8 bg-white/80 backdrop-blur-xl p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white relative overflow-hidden">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
+        <div className="lg:col-span-8 bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-[32px] sm:rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white relative overflow-hidden">
           <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-blue-400 via-blue-600 to-transparent"></div>
           
-          <div className="flex items-center gap-3 mb-10 relative z-10">
+          <div className="flex items-center gap-3 mb-8 sm:mb-10 relative z-10">
             <div className="p-2.5 bg-blue-50 rounded-2xl text-blue-600 shadow-inner">
                <BarChart3 size={20} />
             </div>
             <div>
-               <h2 className="font-black text-slate-800 uppercase text-base tracking-[0.1em] font-display">Biểu đồ tiến độ nộp bài</h2>
-               <p className="text-[10px] text-slate-400 mt-0.5 uppercase font-black tracking-widest">Tỉ lệ hoàn thành theo từng tuần (%)</p>
+               <h2 className="font-black text-slate-800 uppercase text-sm sm:text-base tracking-[0.1em] font-display">Biểu đồ tiến độ nộp bài</h2>
+               <p className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 uppercase font-black tracking-widest">Tỉ lệ hoàn thành theo từng tuần (%)</p>
             </div>
           </div>
           
-          <div className="h-[350px] w-full relative z-10">
+          <div className="h-[250px] sm:h-[350px] w-full relative z-10 -ml-2 sm:ml-0">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={stats.rounds} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
                 <defs>

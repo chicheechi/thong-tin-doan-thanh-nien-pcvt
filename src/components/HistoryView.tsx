@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, ExternalLink, Search, Filter, History, Calendar, User, Info } from 'lucide-react';
+import { X, ExternalLink, Search, Filter, History, Calendar, User, Info, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { apiService } from '../services/api';
 
@@ -28,11 +28,11 @@ export default function HistoryView() {
   return (
     <motion.div 
       whileHover={{ y: -4 }}
-      className="bg-white border border-white rounded-[40px] p-8 lg:p-10 shadow-2xl shadow-blue-900/5 flex-grow flex flex-col h-full transition-all relative overflow-hidden"
+      className="bg-white border border-white rounded-[32px] sm:rounded-[40px] p-6 lg:p-10 shadow-2xl shadow-blue-900/5 flex-grow flex flex-col h-full transition-all relative overflow-hidden"
     >
       <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-blue-400 via-blue-600 to-transparent"></div>
       
-      <div className="flex flex-wrap gap-6 items-center justify-between mb-10">
+      <div className="flex flex-col xl:flex-row gap-4 sm:gap-6 items-start xl:items-center justify-between mb-8 sm:mb-10 w-full">
         <div className="flex items-center gap-3">
            <div className="p-2.5 bg-blue-50 rounded-2xl text-blue-600 shadow-inner">
               <History size={20} />
@@ -45,11 +45,11 @@ export default function HistoryView() {
               </p>
            </div>
         </div>
-        <div className="flex gap-3 items-center ml-auto">
-          <div className="relative group hidden sm:block">
+        <div className="flex flex-col sm:flex-row gap-3 items-stretch md:items-center w-full sm:w-auto h-full sm:ml-auto">
+          <div className="relative group w-full sm:w-auto">
             <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500 transition-colors" size={14} />
             <select 
-              className="text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 font-bold text-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all cursor-pointer appearance-none min-w-[140px]"
+              className="w-full text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 font-bold text-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 focus:bg-white transition-all cursor-pointer appearance-none min-w-full sm:min-w-[140px]"
               value={filterRound}
               onChange={e => setFilterRound(e.target.value)}
             >
@@ -59,13 +59,14 @@ export default function HistoryView() {
               <option value="Tuần 03">Tuần 03</option>
               <option value="Tuần 04">Tuần 04</option>
             </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none group-hover:text-blue-500 transition-colors" size={14} />
           </div>
-          <div className="relative group">
+          <div className="relative group w-full sm:w-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-hover:text-blue-500 transition-colors" size={14} />
             <input 
               type="text" 
               placeholder="Tìm nhân sự..." 
-              className="text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 w-40 font-bold text-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 focus:bg-white placeholder:font-bold placeholder:text-slate-300 transition-all font-sans"
+              className="text-[11px] bg-slate-50 border-2 border-slate-100 rounded-full pl-10 pr-4 py-3 w-full sm:w-40 font-bold text-slate-600 focus:border-blue-400 focus:ring-4 focus:ring-blue-500/10 focus:bg-white placeholder:font-bold placeholder:text-slate-300 transition-all font-sans"
               value={filterMSNV}
               onChange={e => setFilterMSNV(e.target.value)}
             />
@@ -141,7 +142,7 @@ export default function HistoryView() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-[40px] w-full max-w-sm p-8 relative shadow-2xl border border-white overflow-hidden font-sans" 
+              className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-sm p-6 sm:p-8 relative shadow-2xl border border-white overflow-hidden font-sans" 
               onClick={e => e.stopPropagation()}
             >
               <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600"></div>
