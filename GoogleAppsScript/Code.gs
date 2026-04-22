@@ -156,6 +156,11 @@ function getHistory() {
   // Bắt đầu từ 1 để bỏ qua dòng tiêu đề
   for (let i = 1; i < data.length; i++) {
     let msnvRaw = data[i][3] ? data[i][3].toString().trim() : '';
+    // Loại bỏ dấu nháy đơn nếu có ở đầu
+    if (msnvRaw.startsWith("'")) {
+      msnvRaw = msnvRaw.substring(1);
+    }
+    
     let msnv = msnvRaw;
     if (/^\d+$/.test(msnvRaw)) {
         msnv = msnvRaw.padStart(6, '0');
