@@ -5,7 +5,6 @@ import { apiService } from '../services/api';
 
 export default function Overview() {
   const [loading, setLoading] = useState(true);
-  const [showUnsubmitted, setShowUnsubmitted] = useState(false);
   const [stats, setStats] = useState({
     totalStaff: 0,
     totalSubmissions: 0,
@@ -107,11 +106,7 @@ export default function Overview() {
 
         <motion.div 
           whileHover={{ y: -4 }}
-          onClick={() => {
-            setShowUnsubmitted(true);
-            setTimeout(() => document.getElementById('unsubmitted-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
-          }}
-          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group cursor-pointer"
+          className="bg-gradient-to-br from-rose-500 to-rose-600 p-5 sm:p-6 rounded-[24px] sm:rounded-[32px] shadow-2xl shadow-rose-600/30 border border-rose-400 relative overflow-hidden group"
         >
           <div className="absolute top-0 right-0 p-4 opacity-10 text-white group-hover:scale-110 transition-transform">
             <UserMinus size={80} />
@@ -119,7 +114,6 @@ export default function Overview() {
           <p className="text-[9px] sm:text-[10px] font-black text-rose-100 uppercase tracking-widest mb-1 sm:mb-2 relative z-10">CHƯA NỘP BÀI</p>
           <h3 className="text-2xl sm:text-4xl font-black text-white tracking-tight relative z-10 flex items-center gap-2">
             {stats.unsubmittedCount} 
-            <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full inline-block align-middle animate-pulse">XEM CHI TIẾT</span>
           </h3>
         </motion.div>
 
@@ -136,7 +130,7 @@ export default function Overview() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8">
-        <div className="lg:col-span-4 bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white flex flex-col relative overflow-hidden h-fit">
+        <div className="lg:col-span-12 bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-[40px] shadow-2xl shadow-blue-900/5 border border-white flex flex-col relative overflow-hidden h-fit">
           <div className="absolute top-0 right-0 w-1/2 h-1 bg-gradient-to-l from-emerald-400 via-emerald-500 to-transparent"></div>
           
           <div className="flex items-center gap-3 mb-8 relative z-10">
@@ -180,84 +174,6 @@ export default function Overview() {
               </motion.div>
             ))}
           </div>
-        </div>
-
-        <div className="lg:col-span-8 space-y-6">
-          <AnimatePresence>
-            {showUnsubmitted && (
-              <motion.div 
-                id="unsubmitted-section"
-                initial={{ opacity: 0, height: 0, y: 20 }}
-                animate={{ opacity: 1, height: 'auto', y: 0 }}
-                exit={{ opacity: 0, height: 0 }}
-                className="bg-white/80 backdrop-blur-xl p-6 sm:p-8 rounded-[32px] sm:rounded-[40px] shadow-2xl shadow-rose-900/5 border border-white relative overflow-hidden"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                  <div className="flex items-center gap-3">
-                    <div className="p-2.5 bg-rose-50 rounded-2xl text-rose-600 shadow-inner">
-                      <UserMinus size={20} />
-                    </div>
-                    <div>
-                      <h2 className="font-black text-slate-800 uppercase text-sm sm:text-base tracking-[0.1em] font-display">Danh sách chưa nộp bài</h2>
-                      <p className="text-[9px] sm:text-[10px] text-slate-400 mt-0.5 uppercase font-black tracking-widest">{stats.unsubmittedCount} nhân sự cần được nhắc nhở</p>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setShowUnsubmitted(false)}
-                    className="flex text-[10px] items-center gap-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold px-4 py-2 rounded-full uppercase tracking-widest transition-colors w-fit"
-                  >
-                    Thu gọn thẻ <ChevronUp size={14} />
-                  </button>
-                </div>
-
-                <div className="h-[400px] overflow-auto custom-scrollbar pr-2 space-y-6">
-                  {Object.entries(stats.unsubmittedByDept).map(([dept, list]) => (
-                    <div key={dept} className="bg-slate-50 p-4 sm:p-5 rounded-3xl border border-slate-100">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-2.5 h-2.5 rounded-full bg-rose-400"></div>
-                        <h4 className="font-black text-slate-700 text-sm">{dept}</h4>
-                        <span className="text-[10px] font-black bg-rose-100 text-rose-600 px-2.5 py-0.5 rounded-full">{list.length} người</span>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {list.map(s => (
-                          <div key={s.id} className="bg-white border border-slate-200 p-4 rounded-2xl flex items-center justify-between hover:border-rose-300 transition-colors group shadow-sm">
-                            <div>
-                              <p className="font-bold text-slate-800 text-xs sm:text-sm">{s.name}</p>
-                              <div className="flex items-center gap-2 mt-1">
-                                <span className="text-[10px] font-mono text-slate-400 group-hover:text-slate-600">{s.id}</span>
-                              </div>
-                            </div>
-                            <span className="text-[9px] uppercase font-black tracking-widest text-slate-300 bg-slate-50 px-2 py-1 rounded-md">Vắng</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
-            
-            {!showUnsubmitted && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                onClick={() => {
-                  setShowUnsubmitted(true);
-                  setTimeout(() => document.getElementById('unsubmitted-section')?.scrollIntoView({ behavior: 'smooth' }), 100);
-                }}
-                className="bg-white/80 backdrop-blur-xl p-8 rounded-[40px] shadow-sm border-2 border-dashed border-rose-200 hover:border-rose-400 hover:bg-rose-50/50 cursor-pointer flex flex-col items-center justify-center min-h-[300px] transition-all group"
-              >
-                <div className="bg-rose-100 p-4 rounded-full text-rose-500 mb-4 group-hover:scale-110 transition-transform delay-75">
-                  <AlertCircle size={32} />
-                </div>
-                <h3 className="font-black text-slate-800 uppercase tracking-widest mb-2">Xem chi tiết {stats.unsubmittedCount} nhân sự chưa nộp bài</h3>
-                <p className="text-xs text-slate-400 font-bold mb-4">Click vào khu vực này để xem danh sách xếp theo phòng ban</p>
-                <button className="text-[10px] bg-rose-500 text-white font-black px-4 py-2 rounded-full uppercase tracking-widest shadow-lg shadow-rose-500/30 group-hover:bg-rose-600 flex items-center gap-1.5">
-                  Mở danh sách <ChevronDown size={14} />
-                </button>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
       </div>
     </div>
