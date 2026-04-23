@@ -157,8 +157,8 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                             <span className="text-[9px] text-slate-300 italic">Chưa phân loại</span>
                          )}
                       </td>
-                      <td className="py-3 px-4 last:rounded-r-xl text-right">
-                        <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[9px] uppercase tracking-widest shadow-md shadow-blue-500/10 font-sans">
+                      <td className="py-3 px-4 last:rounded-r-xl text-right whitespace-nowrap">
+                        <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[9px] uppercase tracking-widest shadow-md shadow-blue-500/10 font-sans whitespace-nowrap">
                           {item.round}
                         </span>
                       </td>
@@ -184,7 +184,7 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
                       <span className="text-slate-800 text-sm font-display font-black uppercase">{item.name}</span>
                       <span className="text-[9px] text-slate-400 uppercase font-black tracking-widest mt-0.5">{item.department}</span>
                     </div>
-                    <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[8px] uppercase tracking-widest">{item.round}</span>
+                    <span className="bg-blue-600 text-white px-2.5 py-1 rounded-full font-black text-[8px] uppercase tracking-widest whitespace-nowrap">{item.round}</span>
                   </div>
                   
                   <div className="flex justify-between items-center bg-white p-2.5 rounded-xl border border-slate-100 shadow-sm">
@@ -256,85 +256,115 @@ export default function HistoryView({ historyData }: { historyData: any[] }) {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-sm p-6 sm:p-8 relative shadow-2xl border border-white overflow-hidden font-sans" 
+              className="bg-white rounded-[32px] sm:rounded-[36px] w-full max-w-sm p-5 sm:p-6 relative shadow-2xl border border-white overflow-hidden font-sans" 
               onClick={e => e.stopPropagation()}
             >
               <div className="absolute top-0 left-0 w-full h-1.5 bg-blue-600"></div>
               
-              <button className="absolute top-6 right-6 p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-all" onClick={() => setSelectedItem(null)}>
+              <button className="absolute top-5 right-5 p-2 text-slate-400 hover:text-slate-800 hover:bg-slate-100 rounded-full transition-all" onClick={() => setSelectedItem(null)}>
                 <X size={20} />
               </button>
 
-              <div className="mb-8">
+              <div className="mb-6">
                 <h3 className="font-black text-lg tracking-tight uppercase text-slate-800 font-display">Chi Tiết Kết Quả</h3>
-                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1 font-sans">Hồ sơ nộp bài trực tuyến</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-0.5 font-sans">Hồ sơ nộp bài trực tuyến</p>
               </div>
               
-              <div className="space-y-4">
-                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                   <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                      <User size={20} />
+              <div className="space-y-3">
+                <div className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                   <div className="w-9 h-9 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600 flex-shrink-0">
+                      <User size={18} />
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Nhân sự</span>
-                      <span className="font-bold text-slate-800 text-sm font-sans">{selectedItem.name} ({selectedItem.msnv})</span>
+                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1 font-sans">Nhân sự</span>
+                      <span className="font-bold text-slate-800 text-sm font-sans truncate">{selectedItem.name} ({selectedItem.msnv})</span>
                    </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                   <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                      <Info size={20} />
+                <div className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                   <div className="w-9 h-9 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600 flex-shrink-0">
+                      <Info size={18} />
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Phòng ban</span>
-                      <span className="font-bold text-slate-800 text-sm font-sans">{selectedItem.department || 'N/A'}</span>
+                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1 font-sans">Phòng ban</span>
+                      <span className="font-bold text-slate-800 text-sm font-sans truncate">{selectedItem.department || 'N/A'}</span>
                    </div>
                 </div>
 
-                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                   <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600">
-                      <Calendar size={20} />
+                <div className="flex items-center gap-4 bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
+                   <div className="w-9 h-9 bg-white rounded-xl shadow-sm flex items-center justify-center text-blue-600 flex-shrink-0">
+                      <Calendar size={18} />
                    </div>
                    <div className="flex flex-col">
-                      <span className="text-[10px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans">Thời điểm</span>
-                      <span className="font-bold text-slate-800 text-sm whitespace-nowrap font-sans">{selectedItem.round}</span>
+                      <span className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1 font-sans">Thời điểm</span>
+                      <span className="font-bold text-slate-800 text-sm whitespace-nowrap font-sans truncate">{selectedItem.round}</span>
                    </div>
                 </div>
 
                 {selectedItem.status && (
-                  <div className={`flex items-center gap-4 p-4 rounded-2xl border ${selectedItem.status === 'Đã có chứng nhận' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
-                     <div className={`w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-600' : 'text-red-500'}`}>
-                        <Info size={20} />
+                  <div className={`flex items-center gap-4 p-3.5 rounded-2xl border ${selectedItem.status === 'Đã có chứng nhận' ? 'bg-emerald-50 border-emerald-100' : 'bg-red-50 border-red-100'}`}>
+                     <div className={`w-9 h-9 bg-white rounded-xl shadow-sm flex items-center justify-center flex-shrink-0 ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-600' : 'text-red-500'}`}>
+                        <Info size={18} />
                      </div>
                      <div className="flex flex-col">
-                        <span className={`text-[10px] font-black uppercase tracking-widest leading-none mb-1.5 font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700/60' : 'text-red-700/60'}`}>Trạng Thái</span>
-                        <span className={`font-bold text-sm font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700' : 'text-red-700'}`}>{selectedItem.status}</span>
+                        <span className={`text-[9px] font-black uppercase tracking-widest leading-none mb-1 font-sans ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700/60' : 'text-red-700/60'}`}>Trạng Thái</span>
+                        <span className={`font-bold text-sm font-sans truncate ${selectedItem.status === 'Đã có chứng nhận' ? 'text-emerald-700' : 'text-red-700'}`}>{selectedItem.status}</span>
                      </div>
                   </div>
                 )}
               </div>
               
-              <motion.a 
-                whileHover={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 1.02 } : {}}
-                whileTap={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? { scale: 0.98 } : {}}
-                href={selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl || '#'} 
-                target="_blank" 
-                rel="noreferrer" 
-                className={`mt-8 border-2 border-dashed rounded-[24px] p-8 flex flex-col items-center justify-center text-center group transition-all block cursor-pointer group ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'border-blue-200 hover:border-blue-600 bg-blue-50/50' : 'border-slate-100 bg-slate-50 cursor-not-allowed opacity-60'}`}
-              >
-                 <div className={`w-16 h-16 bg-white rounded-2xl shadow-xl flex items-center justify-center mb-4 transition-transform ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-600 group-hover:scale-110' : 'text-slate-300'}`}>
-                    <ExternalLink size={28} />
-                 </div>
-                 <p className={`text-xs font-black uppercase tracking-[0.2em] font-sans ${selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'text-blue-700' : 'text-slate-400'}`}>
-                   {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Xem Ảnh Minh Chứng' : 'Chưa có liên kết ảnh'}
-                 </p>
-                 <p className="text-[9px] text-blue-400 mt-2 font-bold italic tracking-wide font-sans">
-                   {selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl ? 'Mở rộng trong cửa sổ Drive mới' : 'Dữ liệu đang được đồng bộ...'}
-                 </p>
-              </motion.a>
+              {(() => {
+                const linkString = selectedItem.link || selectedItem.imageUrl || selectedItem.driveLink || selectedItem.fileUrl || '';
+                const links = linkString.split(',').map((l: string) => l.trim()).filter(Boolean);
+                
+                if (links.length === 0) {
+                  return (
+                    <div className="mt-5 border-2 border-dashed rounded-[20px] p-5 flex flex-col items-center justify-center text-center border-slate-100 bg-slate-50 opacity-60">
+                       <div className="w-12 h-12 bg-white rounded-xl shadow-md flex items-center justify-center mb-3 text-slate-300">
+                          <ExternalLink size={24} />
+                       </div>
+                       <p className="text-xs font-black uppercase tracking-[0.1em] font-sans text-slate-400">
+                         Chưa có liên kết ảnh
+                       </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="mt-5 space-y-2">
+                    <p className="text-[9px] text-slate-400 font-black uppercase tracking-widest leading-none mb-1.5 font-sans pl-1">Ảnh Minh Chứng ({links.length})</p>
+                    <div className="grid grid-cols-1 gap-2 max-h-[140px] overflow-y-auto custom-scrollbar pr-1">
+                      {links.map((link: string, index: number) => (
+                        <motion.a 
+                          key={index}
+                          whileHover={{ scale: 1.01 }}
+                          whileTap={{ scale: 0.99 }}
+                          href={link} 
+                          target="_blank" 
+                          rel="noreferrer" 
+                          className="bg-blue-50/50 border border-blue-100 hover:border-blue-300 hover:bg-blue-50 rounded-xl p-3 flex items-center gap-3 transition-all block cursor-pointer group shadow-sm"
+                        >
+                           <div className="w-8 h-8 bg-white rounded-lg shadow-sm flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform flex-shrink-0">
+                              <ExternalLink size={16} />
+                           </div>
+                           <div className="flex flex-col flex-grow">
+                             <p className="text-[11px] font-black uppercase tracking-[0.1em] font-sans text-blue-700">
+                               Hình ảnh {index + 1}
+                             </p>
+                             <p className="text-[8px] text-blue-500 mt-0.5 font-bold italic tracking-wide font-sans">
+                               Click để mở Drive
+                             </p>
+                           </div>
+                        </motion.a>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
               
               <button 
-                className="w-full bg-slate-900 hover:bg-black text-white font-black py-4 mt-8 rounded-2xl uppercase text-[10px] tracking-[0.2em] transition-all shadow-xl shadow-slate-900/10 font-sans" 
+                className="w-full bg-slate-900 hover:bg-black text-white font-black py-3.5 mt-6 rounded-xl uppercase text-[10px] tracking-[0.2em] transition-all shadow-xl shadow-slate-900/10 font-sans" 
                 onClick={() => setSelectedItem(null)}
               >
                 Đóng thông tin

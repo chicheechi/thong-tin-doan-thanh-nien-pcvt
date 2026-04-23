@@ -6,7 +6,9 @@ import { apiService } from '../services/api';
 export default function Overview({ staffData, historyData }: { staffData: any[], historyData: any[] }) {
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [showRoundModal, setShowRoundModal] = useState<string | null>(null);
   const [searchUnsubmitted, setSearchUnsubmitted] = useState('');
+  const [searchRound, setSearchRound] = useState('');
   const [stats, setStats] = useState({
     totalStaff: 0,
     totalSubmissions: 0,
@@ -131,7 +133,8 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.1 }}
-                className="p-4 rounded-[24px] bg-slate-50 border border-slate-100 group hover:shadow-lg hover:shadow-slate-200/50 transition-all hover:-translate-y-1"
+                onClick={() => setShowRoundModal(round.name)}
+                className="p-4 rounded-[24px] bg-slate-50 border border-slate-100 group hover:shadow-lg hover:shadow-slate-200/50 transition-all hover:-translate-y-1 cursor-pointer"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs md:text-sm font-black text-slate-400 uppercase tracking-widest group-hover:text-blue-600 transition-colors">{round.name}</span>
@@ -239,6 +242,123 @@ export default function Overview({ staffData, historyData }: { staffData: any[],
                           </div>
                         );
                       })}
+                   </div>
+                </div>
+             </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showRoundModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+             <motion.div 
+               initial={{ opacity: 0 }}
+               animate={{ opacity: 1 }}
+               exit={{ opacity: 0 }}
+               className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+               onClick={() => setShowRoundModal(null)}
+             />
+             <motion.div 
+               initial={{ opacity: 0, scale: 0.95, y: 20 }}
+               animate={{ opacity: 1, scale: 1, y: 0 }}
+               exit={{ opacity: 0, scale: 0.95, y: 20 }}
+               className="bg-white rounded-[32px] sm:rounded-[40px] w-full max-w-4xl max-h-[90vh] sm:max-h-[80vh] overflow-hidden flex flex-col relative z-10 shadow-2xl shadow-blue-900/20 m-2"
+             >
+                <div className="p-5 sm:p-8 pb-4 flex items-center justify-between">
+                   <div className="flex items-center gap-3">
+                      <div className="p-3 bg-blue-50 rounded-2xl text-blue-500">
+                        <CheckCircle2 size={24} />
+                      </div>
+                      <div>
+                        <h2 className="text-base sm:text-xl font-black text-slate-800 uppercase tracking-tight">Đã nộp bài - {showRoundModal}</h2>
+                        <p className="text-[10px] text-blue-500 font-black uppercase tracking-widest mt-1">Danh sách nhân sự hoàn thành</p>
+                      </div>
+                   </div>
+                   <button 
+                    onClick={() => setShowRoundModal(null)}
+                    className="p-2 bg-slate-100 hover:bg-slate-200 rounded-full transition-all text-slate-500"
+                   >
+                     <X size={20} />
+                   </button>
+                </div>
+
+                <div className="px-5 sm:px-8 mb-4 sm:mb-6">
+                   <div className="relative group">
+                     <Search size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400" />
+                     <input 
+                       type="text"
+                       placeholder="Tìm kiếm theo tên hoặc mã số..."
+                       value={searchRound}
+                       onChange={(e) => setSearchRound(e.target.value)}
+                       className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-sm font-bold focus:border-blue-300 focus:bg-white focus:ring-4 focus:ring-blue-500/5 transition-all outline-none"
+                     />
+                   </div>
+                </div>
+
+                <div className="flex-grow overflow-auto px-5 sm:px-8 pb-8 sm:pb-10 custom-scrollbar">
+                   <div className="space-y-8">
+                      {(() => {
+                        // Lọc các bản ghi theo tuần, sau đó lọc trùng lặp MSNV để đếm số user thật
+                        const records = historyData.filter(h => h.round === showRoundModal);
+                        const uniqueMap = new Map();
+                        records.forEach(item => {
+                          if (!uniqueMap.has(item.msnv)) {
+                            uniqueMap.set(item.msnv, item);
+                          }
+                        });
+                        const uniqueRecords = Array.from(uniqueMap.values());
+
+                        const byDept = uniqueRecords.reduce((acc: any, curr: any) => {
+                          const dept = curr.department || 'Khác';
+                          if (!acc[dept]) acc[dept] = [];
+                          acc[dept].push(curr);
+                          return acc;
+                        }, {});
+
+                        const entries = Object.entries(byDept);
+                        if (entries.length === 0) {
+                           return (
+                             <div className="text-center py-10 text-slate-400 text-sm font-bold">
+                               Chưa có dữ liệu nộp bài
+                             </div>
+                           );
+                        }
+
+                        return entries.map(([dept, list]) => {
+                          const staffList = list as any[];
+                          const filtered = staffList.filter(s => 
+                            (s.name || '').toLowerCase().includes(searchRound.toLowerCase()) || 
+                            (s.msnv || '').includes(searchRound)
+                          );
+                          if (filtered.length === 0) return null;
+
+                          return (
+                            <div key={dept}>
+                               <div className="flex items-center gap-3 mb-4 sticky top-0 bg-white py-2 z-10">
+                                 <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                                 <h3 className="font-black text-slate-700 text-sm uppercase tracking-widest">{dept}</h3>
+                                 <span className="text-[10px] bg-blue-50 text-blue-600 px-2.5 py-0.5 rounded-full font-black">{filtered.length} người</span>
+                               </div>
+                               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                  {filtered.map(s => (
+                                    <div key={s.msnv} className="bg-slate-50/50 border border-slate-100 p-4 rounded-2xl flex flex-col justify-center group hover:bg-blue-50 hover:border-blue-100 transition-all">
+                                      <div className="flex items-start justify-between">
+                                        <div>
+                                          <p className="font-bold text-slate-800 text-sm group-hover:text-blue-700 transition-colors uppercase font-display">{s.name}</p>
+                                          <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-1">{dept}</p>
+                                        </div>
+                                        <div className="bg-white px-2 py-0.5 rounded-lg border border-slate-100 shadow-sm">
+                                          <span className="font-mono text-[10px] text-blue-600 font-bold">{s.msnv}</span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                               </div>
+                            </div>
+                          );
+                        });
+                      })()}
                    </div>
                 </div>
              </motion.div>
